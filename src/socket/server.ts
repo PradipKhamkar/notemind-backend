@@ -1,18 +1,34 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io"
+import socketConstant from "../constants/socket.constant";
+import noteService from "../services/note.service";
+import { INewNotePayload } from "../types/note.type";
+import AuthenticateSocket from "../middleware/AuthenticateSocket";
+import { IUser } from "../types/user.type";
 const app = express();
 
 const httpServer = createServer(app);
-const io = new Server(httpServer,{
+
+const io = new Server(httpServer, {
 });
+
+io.use(AuthenticateSocket);
 
 io.on("connect", (socket) => {
-  console.log('Socket Connected Successfully!', socket.id);
-   socket.on("error", (err) => {
-    console.log("❌ Socket error:", err);
-  });
+  // @ts-ignore
+  const user:IUser = socket.user;
+  const { noteJob } = socketConstant.events
+  socket.on(noteJob.job_added, async (payload: INewNotePayload) => {
+    try {
+      socket.emit(noteJob.job_started)
+      const newNote = await noteService.newNote(user._id, payload);
+      socket.emit(noteJob.job_done, newNote)
+    } catch (error) {
+      socket.emit(noteJob.job_failed, error)
+    }
+  })
 });
 
 
-export { app, io,httpServer }
+export { app, io, httpServer }

@@ -1,15 +1,13 @@
 import express from "express";
-import expressFileUpload from "express-fileupload";
-import { app,httpServer } from "./socket/server";
+import { app, httpServer } from "./socket/server";
 
 app.use(express.json());
 
-import fileRoute from "./routes/file.route";
 import noteRoute from "./routes/note.route";
 import authRoute from "./routes/auth.route";
+import Authenticate from "./middleware/Authenticate";
 
-app.use('/file',fileRoute);
-app.use('/note',noteRoute);
-app.use('/auth',authRoute);
+app.use('/notes', Authenticate, noteRoute);
+app.use('/auth', authRoute);
 
 export default httpServer;

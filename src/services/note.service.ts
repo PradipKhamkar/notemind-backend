@@ -2,6 +2,7 @@ import { INewNotePayload } from "../types/note.type";
 import geminiHelper from "../helper/gemini.helper";
 import promptConstant from "../constants/prompt.constant";
 import structureOutputJSONSchema from "../constants/structure.constant";
+import { NoteModel } from "../models/note.model";
 
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
@@ -14,7 +15,7 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
 
     // Initialize Empty New Note 
     const notesData = {
-      transcribe: "",
+      transcript: "",
       content: "",
       language: "",
       title: "",
@@ -28,18 +29,27 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
         const res = await geminiHelper.getNotesResponse(system, messages, structureOutput);
         const ytNote = JSON.parse(res as string);
         notesData["content"] = ytNote.note
-        notesData["transcribe"] = ytNote.transcriptOfVideo
+        notesData["transcript"] = ytNote.transcriptOfVideo
         notesData["title"] = ytNote.noteTitle
         notesData["metaData"] = ytNote.metaData
         notesData["language"] = ytNote.language
-        return JSON.parse(res as string);
+        console.log('NewNotesAIRes',ytNote)
         break;
     }
-
-    return notesData
+    const newNote = await NoteModel.create({ ...notesData, createdBy: userId })
+    return newNote;
   } catch (error) {
     throw error
   }
 }
 
-export default { newNote }
+const getAllNotes = async(userId:string)=>{
+  try {
+    const notes = await NoteModel.find({createdBy:userId});
+    return notes
+  } catch (error) {
+    throw error
+  }
+}
+
+export default { newNote,getAllNotes }
