@@ -1,6 +1,6 @@
 import express from "express";
 import expressFileUpload from "express-fileupload";
-import { app } from "./socket/server";
+import { app,httpServer } from "./socket/server";
 
 app.use(express.json());
 
@@ -12,4 +12,4 @@ app.use('/file',fileRoute);
 app.use('/note',noteRoute);
 app.use('/auth',authRoute);
 
-export default app;
+export default httpServer;
