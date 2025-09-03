@@ -3,11 +3,11 @@ import {
 } from "@google/genai";
 import config from "../config";
 
-const client = new GoogleGenAI({ apiKey: config.GOOGLE.GEMINI_API_KEY });
+const geminiClient = new GoogleGenAI({ apiKey: config.GOOGLE.GEMINI_API_KEY });
 
 const getNotesResponse = async (system: string, messages: any[], structureOutput: any) => {
   try {
-    const res = await client.models.generateContent({
+    const res = await geminiClient.models.generateContent({
       model: "gemini-2.5-flash",
       config: {
         systemInstruction: {
@@ -36,4 +36,19 @@ const getFileURLMessage = (fileUrl: string) => {
   }
 }
 
-export default { getNotesResponse,getFileURLMessage }
+const uploadFile = async (fileURL: string, type: string) => {
+  try {
+    const pdfBuffer = await fetch(fileURL).then((response) => response.arrayBuffer());
+    const fileBlob = new Blob([pdfBuffer], { type });
+    const res = await geminiClient.files.upload({ file: fileBlob, config: { mimeType: type } });
+    return {
+      fileName: res.name,
+      size: res.sizeBytes,
+      mimType: res.mimeType,
+      uri: res.uri
+    }
+  } catch (error) {
+    throw error
+  }
+}
+export default { getNotesResponse, getFileURLMessage, geminiClient, uploadFile }

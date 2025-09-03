@@ -9,5 +9,6 @@ import Authenticate from "./middleware/Authenticate";
 
 app.use('/notes', Authenticate, noteRoute);
 app.use('/auth', authRoute);
+app.use('/file', Authenticate, authRoute);
 
 export default httpServer;
