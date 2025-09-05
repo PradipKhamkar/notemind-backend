@@ -51,4 +51,17 @@ const uploadFile = async (fileURL: string, type: string) => {
     throw error
   }
 }
-export default { getNotesResponse, getFileURLMessage, geminiClient, uploadFile }
+
+const deleteFile = async (fileName: string) => {
+  try {
+    const deleteRes = await geminiClient.files.delete({ name: fileName });
+    const allFiles = await geminiClient.files.list();
+    console.log('DELETE response', deleteRes);
+    console.log('allFiles', allFiles);
+    return deleteFile
+  } catch (error) {
+    throw error
+  }
+}
+
+export default { getNotesResponse, getFileURLMessage, geminiClient, uploadFile, deleteFile }

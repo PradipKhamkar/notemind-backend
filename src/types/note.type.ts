@@ -2,7 +2,8 @@
 interface INewNotePayload {
   type: TSource;
   sourceData: {
-    link?: string
+    link?: string;
+    fileId?:string;
   }
 };
 

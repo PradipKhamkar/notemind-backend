@@ -19,6 +19,11 @@ const fileSchema = new Schema<IFile>({
   uploadId:{
     type:String,
     required:true
+  },
+  name:{
+    type:String,
+    required:true,
+    default:"Untitled"
   }
 },{timestamps:true});
 

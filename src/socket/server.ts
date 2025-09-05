@@ -21,6 +21,7 @@ io.on("connect", (socket) => {
   const { noteJob } = socketConstant.events
   socket.on(noteJob.job_added, async (payload: INewNotePayload) => {
     try {
+      console.log('event catch')
       socket.emit(noteJob.job_started)
       const newNote = await noteService.newNote(user._id, payload);
       socket.emit(noteJob.job_done, newNote)

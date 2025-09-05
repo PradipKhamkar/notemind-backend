@@ -23,7 +23,7 @@ const uploadFileOnCloudinary = async (file: UploadedFile) => {
     });
     return {
       uploadId: result.public_id,
-      url: result.url,
+      url: result.secure_url,
       type: file.mimetype,
       name: file.name,
     };
@@ -38,6 +38,7 @@ const uploadFile = async (file: UploadedFile, userId: string) => {
     const cloudinaryResponse = await uploadFileOnCloudinary(file);
     const { type, url, uploadId } = cloudinaryResponse;
     const geminiFileResponse = await geminiHelper.uploadFile(url, type);
+    console.log('FILE NAME',file.name)
     await FileModel.create({
       createdBy: userId,
       path: url,
@@ -51,6 +52,7 @@ const uploadFile = async (file: UploadedFile, userId: string) => {
       path: geminiFileResponse.uri,
     };
   } catch (error) {
+    console.log('Error In File Uploading::',error)
     throw error;
   }
 };
