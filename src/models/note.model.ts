@@ -1,4 +1,4 @@
-import mongoose,{ model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import { INote } from "../types/note.type";
 
 const NoteSchema = new Schema<INote>(
@@ -9,32 +9,36 @@ const NoteSchema = new Schema<INote>(
       link: String,
       text: String,
     },
-    content:{
-      type:String,
-      required:true,
-      trim:true,
+    content: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    folder:{
-      type:mongoose.Types.ObjectId,
-      ref:"folder"
+    folder: {
+      type: mongoose.Types.ObjectId,
+      ref: "folder"
     },
     // @ts-ignore
-    createdBy:{
-      type:mongoose.Types.ObjectId,
-      ref:"users",
-      required:true
+    createdBy: {
+      type: mongoose.Types.ObjectId,
+      ref: "users",
+      required: true
     },
-    language:{
-      type:String,
-      required:true,
+    language: {
+      type: String,
+      required: true,
     },
-    transcript:{
-      type:String,
-      required:true,
-      trim:true
+    transcript: {
+      type: String,
+      required: true,
+      trim: true
     },
+    metaData: {
+      type: Object,
+      default: {}
+    }
   },
-  { timestamps:true }
+  { timestamps: true }
 );
 
 export const NoteModel = model<INote>("Note", NoteSchema);

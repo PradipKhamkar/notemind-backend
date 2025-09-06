@@ -6,5 +6,6 @@ export interface IFile {
   uploadId: string;
   path: string;
   size:number;
-  name:string
+  name:string;
+  metaData:Object
 }

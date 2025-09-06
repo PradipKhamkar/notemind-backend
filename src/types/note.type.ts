@@ -22,6 +22,7 @@ interface INote {
   };
   content: string;
   language: string;
+  metaData:object;
 }
 
 type TSource = "youtube" | "web" | "pdf" | "audio"

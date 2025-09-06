@@ -65,7 +65,7 @@ const youtube = {
   },
   "additionalProperties": false
 }
-const pdf ={
+const pdf = {
   "type": "object",
   "description": "Structured output schema for AI-generated PDF document notes",
   "required": ["noteTitle", "note", "documentText", "metaData", "language"],
@@ -146,13 +146,90 @@ const pdf ={
   },
   "additionalProperties": false
 }
+const audio = {
+  type: "object",
+  properties: {
+    noteTitle: {
+      type: "string",
+      description: "Concise title for the notes with one relevant emoji at the start"
+    },
+    note: {
+      type: "string",
+      description: "Complete structured notes in Markdown format following the specified template"
+    },
+    audioTranscript: {
+      type: "string",
+      description: "Complete transcript of the audio content with speaker attributions and timestamps if available"
+    },
+    audioSummary: {
+      type: "string",
+      description: "Brief 2-3 sentence overview of what the audio content covers"
+    },
+    metaData: {
+      type: "object",
+      properties: {
+        duration: {
+          type: "string",
+          description: "Duration of the audio in format like '15:30' or '1:23:45'"
+        },
+        dateGenerated: {
+          type: "string",
+          description: "Date when notes were generated in YYYY-MM-DD format"
+        },
+        audioType: {
+          type: "string",
+          description: "Category/type of the audio content",
+          enum: [
+            "Podcast",
+            "Interview",
+            "Lecture",
+            "Educational Content",
+            "Meeting/Conference Call",
+            "Presentation",
+            "Webinar",
+            "Workshop",
+            "Panel Discussion",
+            "Audiobook",
+            "Music/Song",
+            "Radio Show",
+            "Documentary",
+            "News/Broadcast",
+            "Voice Memo",
+            "Training Material",
+            "Storytelling",
+            "Other"
+          ]
+        },
+        speakerCount: {
+          type: "integer",
+          description: "Number of distinct speakers in the audio"
+        },
+        audioQuality: {
+          type: "string",
+          description: "Assessment of audio quality",
+          enum: ["High", "Medium", "Low"]
+        },
+        audioSource: {
+          type: "string",
+          description: "Source of the audio if available (podcast name, channel, platform, etc.)"
+        }
+      },
+      required: ["duration", "dateGenerated", "audioType", "speakerCount"]
+    },
+    language: {
+      type: "string",
+      description: "Detected language of the audio content (ISO 639-1 code)"
+    }
+  },
+  required: ["noteTitle", "note", "audioTranscript", "audioSummary", "metaData", "language"]
+};
 
 
 const structureOutputJSONSchema = {
   youtube: youtube,
   pdf: pdf,
-  web: "",
-  audio: "",
+  audio: audio,
+  web: ''
 };
 
 export default structureOutputJSONSchema;

@@ -29,7 +29,6 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     notesData["content"] = aiStructureOutput.note
     notesData["metaData"] = aiStructureOutput.metaData
     notesData["language"] = aiStructureOutput.language
-    console.log('aiStructureOutput', aiStructureOutput);
 
     // Handel Types
     switch (type) {
@@ -41,6 +40,12 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
         notesData["transcript"] = aiStructureOutput.documentText;
         await geminiHelper.deleteFile(fileId as string)
         break
+      case "audio":
+        notesData["transcript"] = aiStructureOutput.audioTranscript;
+        await geminiHelper.deleteFile(fileId as string);
+        break
+      default:
+        throw new Error("Invalid source type!")
     }
     const newNote = await NoteModel.create({ ...notesData, createdBy: userId })
     return newNote;
