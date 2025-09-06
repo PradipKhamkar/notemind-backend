@@ -92,17 +92,12 @@ const pdf = {
     "metaData": {
       "type": "object",
       "description": "Essential metadata about the document and note generation",
-      "required": ["pageCount", "dateGenerated", "documentType", "estimatedReadingTime"],
+      "required": ["pageCount", "documentType", "estimatedReadingTime"],
       "properties": {
         "pageCount": {
           "type": "integer",
           "description": "Total number of pages in the document",
           "minimum": 1
-        },
-        "dateGenerated": {
-          "type": "string",
-          "description": "Date when notes were generated in ISO format",
-          "format": "date"
         },
         "documentType": {
           "type": "string",
@@ -172,10 +167,6 @@ const audio = {
           type: "string",
           description: "Duration of the audio in format like '15:30' or '1:23:45'"
         },
-        dateGenerated: {
-          type: "string",
-          description: "Date when notes were generated in YYYY-MM-DD format"
-        },
         audioType: {
           type: "string",
           description: "Category/type of the audio content",
@@ -204,17 +195,12 @@ const audio = {
           type: "integer",
           description: "Number of distinct speakers in the audio"
         },
-        audioQuality: {
-          type: "string",
-          description: "Assessment of audio quality",
-          enum: ["High", "Medium", "Low"]
-        },
         audioSource: {
           type: "string",
           description: "Source of the audio if available (podcast name, channel, platform, etc.)"
         }
       },
-      required: ["duration", "dateGenerated", "audioType", "speakerCount"]
+      required: ["duration", "audioType", "speakerCount"]
     },
     language: {
       type: "string",
@@ -224,12 +210,79 @@ const audio = {
   required: ["noteTitle", "note", "audioTranscript", "audioSummary", "metaData", "language"]
 };
 
+const video = {
+  type: "object",
+  properties: {
+    noteTitle: {
+      type: "string",
+      description: "Concise title for the notes with one relevant emoji at the start"
+    },
+    note: {
+      type: "string",
+      description: "Complete structured notes in Markdown format following the specified template, including both audio and visual elements"
+    },
+    videoTranscript: {
+      type: "string",
+      description: "Complete transcript of the video content with speaker attributions and timestamps if available"
+    },
+    // videoSummary: {
+    //   type: "string",
+    //   description: "Brief 2-3 sentence overview of what the video content covers"
+    // },
+    metaData: {
+      type: "object",
+      properties: {
+        duration: {
+          type: "string",
+          description: "Duration of the video in format like '15:30' or '1:23:45'"
+        },
+        videoType: {
+          type: "string",
+          description: "Category/type of the video content",
+          enum: [
+            "Educational/Tutorial",
+            "Lecture/Presentation",
+            "How-To/Demonstration",
+            "Interview/Discussion",
+            "Product Review",
+            "Documentary",
+            "Webinar",
+            "Workshop/Training",
+            "Conference Talk",
+            "Course Content",
+            "Software Demo",
+            "Screen Recording",
+            "Live Stream",
+            "Vlog/Personal",
+            "News/Analysis",
+            "Entertainment",
+            "Music Video",
+            "Animation/Explainer",
+            "Other"
+          ]
+        },
+        speakerCount: {
+          type: "integer",
+          description: "Number of distinct speakers/presenters in the video"
+        },
+      },
+      required: ["duration", "videoType", "speakerCount",]
+    },
+    language: {
+      type: "string",
+      description: "Detected language of the video content (ISO 639-1 code)"
+    },
+  },
+  required: ["noteTitle", "note", "videoTranscript", "metaData", "language"]
+};
+
 
 const structureOutputJSONSchema = {
   youtube: youtube,
   pdf: pdf,
   audio: audio,
-  web: ''
+  web: '',
+  video:video
 };
 
 export default structureOutputJSONSchema;

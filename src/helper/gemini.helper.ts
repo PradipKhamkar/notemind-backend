@@ -41,6 +41,7 @@ const uploadFile = async (fileURL: string, type: string) => {
     const pdfBuffer = await fetch(fileURL).then((response) => response.arrayBuffer());
     const fileBlob = new Blob([pdfBuffer], { type });
     const res = await geminiClient.files.upload({ file: fileBlob, config: { mimeType: type } });
+    console.log('Gemini File Upload Response::',res)
     return {
       fileName: res.name,
       size: res.sizeBytes,

@@ -4,6 +4,8 @@ interface INewNotePayload {
   sourceData: {
     link?: string;
     fileId?:string;
+    originalPath?:string;
+    uploadId?:string
   }
 };
 
@@ -25,6 +27,6 @@ interface INote {
   metaData:object;
 }
 
-type TSource = "youtube" | "web" | "pdf" | "audio"
+type TSource = "youtube" | "web" | "pdf" | "audio"|'video'
 
 export { TSource, INewNotePayload, INote }

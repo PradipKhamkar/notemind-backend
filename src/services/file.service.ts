@@ -12,9 +12,10 @@ cloudinary.config({
 
 const uploadFileOnCloudinary = async (file: UploadedFile) => {
   try {
+    const resourceType = file.mimetype.includes("video") || file.mimetype.includes("audio") ? "video" : "auto"
     const result: UploadApiResponse = await new Promise((resolve, reject) => {
       cloudinary.uploader
-        .upload_stream({ folder: FOLDER_NAME }, (error, result) => {
+        .upload_stream({ folder: FOLDER_NAME, resource_type: resourceType }, (error, result) => {
           if (error) reject(error);
           // @ts-ignore
           resolve(result);
@@ -38,7 +39,6 @@ const uploadFile = async (file: UploadedFile, userId: string) => {
     const cloudinaryResponse = await uploadFileOnCloudinary(file);
     const { type, url, uploadId } = cloudinaryResponse;
     const geminiFileResponse = await geminiHelper.uploadFile(url, type);
-    console.log('FILE NAME',file.name)
     await FileModel.create({
       createdBy: userId,
       path: url,
@@ -48,13 +48,15 @@ const uploadFile = async (file: UploadedFile, userId: string) => {
       type: file.mimetype,
     });
     return {
-      fileId: geminiFileResponse.fileName,
-      path: geminiFileResponse.uri,
+      tempFileId: geminiFileResponse.fileName,
+      tempPath: geminiFileResponse.uri,
+      originalPath:cloudinaryResponse.url,
+      uploadId:cloudinaryResponse.uploadId
     };
   } catch (error) {
-    console.log('Error In File Uploading::',error)
+    console.log('Error In File Uploading::', error)
     throw error;
   }
 };
 
-export default {uploadFile};
+export default { uploadFile };

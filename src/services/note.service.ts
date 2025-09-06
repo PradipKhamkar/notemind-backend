@@ -7,12 +7,12 @@ import { NoteModel } from "../models/note.model";
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
     const { type, sourceData } = payload;
-    const { link, fileId } = sourceData
+    const { link, fileId, originalPath, uploadId } = sourceData
     const messages = []
     if (link) messages.push(geminiHelper.getFileURLMessage(link));
     const system = promptConstant.systemPrompt[type];
     const structureOutput = structureOutputJSONSchema[type];
-    console.log('payload', payload, messages)
+
     // Initialize Empty New Note 
     const notesData = {
       transcript: "",
@@ -20,7 +20,7 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
       language: "",
       title: "",
       metaData: {},
-      source: { type, link }
+      source: { type, link, uploadId }
     };
 
     const res = await geminiHelper.getNotesResponse(system, messages, structureOutput);
@@ -29,20 +29,23 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     notesData["content"] = aiStructureOutput.note
     notesData["metaData"] = aiStructureOutput.metaData
     notesData["language"] = aiStructureOutput.language
+    console.log('aiStructureOutput', aiStructureOutput);
+    if (originalPath) notesData["source"]["link"] = originalPath;
+    if (fileId) await geminiHelper.deleteFile(fileId as string);
 
     // Handel Types
     switch (type) {
       case "youtube":
         notesData["transcript"] = aiStructureOutput.transcriptOfVideo
-        console.log('NewNotesAIRes', aiStructureOutput)
         break;
       case "pdf":
         notesData["transcript"] = aiStructureOutput.documentText;
-        await geminiHelper.deleteFile(fileId as string)
         break
       case "audio":
         notesData["transcript"] = aiStructureOutput.audioTranscript;
-        await geminiHelper.deleteFile(fileId as string);
+        break
+      case "video":
+        notesData["transcript"] = aiStructureOutput.videoTranscript;
         break
       default:
         throw new Error("Invalid source type!")
