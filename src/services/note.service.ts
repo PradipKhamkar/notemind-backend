@@ -3,6 +3,7 @@ import geminiHelper from "../helper/gemini.helper";
 import promptConstant from "../constants/prompt.constant";
 import structureOutputJSONSchema from "../constants/structure.constant";
 import { NoteModel } from "../models/note.model";
+import FolderModel from "../models/folder.model";
 
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
@@ -60,8 +61,9 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
 
 const getAllNotes = async (userId: string) => {
   try {
-    const notes = await NoteModel.find({ createdBy: userId });
-    return notes
+    const notes = await NoteModel.find({ createdBy: userId }).select('-createdBy');;
+    const folders = await FolderModel.find({createdBy:userId}).select('-createdBy');
+    return {notes,folders}
   } catch (error) {
     throw error
   }

@@ -7,7 +7,7 @@ const getAllNotes = async(request:Request,res:Response)=>{
     // @ts-ignore
     const userId = request.userId
     const notes = await noteService.getAllNotes(userId);
-  successResponse(res,"Notes Fetched Successfully!",{notes},200)
+  successResponse(res,"Notes Fetched Successfully!",notes,200)
   } catch (error:any) {
     console.log('Error In Fetched Notes',error)
    errorResponse(res,error?.message||"Failed To Fetched All Notes")

@@ -5,7 +5,7 @@ const NoteSchema = new Schema<INote>(
   {
     title: { type: String, required: true },
     source: {
-      type: { type: String, enum: ["youtube", "web", "pdf", "audio"], required: true },
+      type: { type: String, enum: ["youtube", "web", "pdf", "audio","video"], required: true },
       link: String,
       text: String,
     },
