@@ -9,14 +9,6 @@ interface INewNotePayload {
   }
 };
 
-interface INoteContent {
-  summary: string;
-  actionPoints: string[];
-  keyTopics: {
-    title: string;
-    description: string
-  }[]
-}
 interface INote {
   _id: string;
   title: string;
@@ -30,7 +22,12 @@ interface INote {
     link?: string;
     text?: string;
   };
-  content: INoteContent;
+  summary: string;
+  keyPoints: string[];
+  sections: {
+    heading: string;
+    content: string
+  }[];
   language: string;
   metaData: object;
 }
