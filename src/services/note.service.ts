@@ -26,8 +26,8 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
 
     const res = await geminiHelper.getNotesResponse(system, messages, structureOutput);
     const aiStructureOutput = JSON.parse(res as string);
-    notesData["title"] = aiStructureOutput.noteTitle
-    notesData["content"] = aiStructureOutput.note
+    notesData["title"] = aiStructureOutput.title
+    notesData["content"] = aiStructureOutput.structuredNotes
     notesData["metaData"] = aiStructureOutput.metaData
     notesData["language"] = aiStructureOutput.language
     console.log('aiStructureOutput', aiStructureOutput);

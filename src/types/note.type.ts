@@ -3,12 +3,20 @@ interface INewNotePayload {
   type: TSource;
   sourceData: {
     link?: string;
-    fileId?:string;
-    originalPath?:string;
-    uploadId?:string
+    fileId?: string;
+    originalPath?: string;
+    uploadId?: string
   }
 };
 
+interface INoteContent {
+  summary: string;
+  actionPoints: string[];
+  keyTopics: {
+    title: string;
+    description: string
+  }[]
+}
 interface INote {
   _id: string;
   title: string;
@@ -22,11 +30,11 @@ interface INote {
     link?: string;
     text?: string;
   };
-  content: string;
+  content: INoteContent;
   language: string;
-  metaData:object;
+  metaData: object;
 }
 
-type TSource = "youtube" | "web" | "pdf" | "audio"|'video'
+type TSource = "youtube" | "web" | "pdf" | "audio" | 'video'
 
 export { TSource, INewNotePayload, INote }
