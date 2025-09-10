@@ -1,4 +1,4 @@
-import { INewNotePayload } from "../types/note.type";
+import { INewNotePayload, INote } from "../types/note.type";
 import geminiHelper from "../helper/gemini.helper";
 import promptConstant from "../constants/prompt.constant";
 import { NoteModel } from "../models/note.model";
@@ -56,4 +56,18 @@ const getAllNotes = async (userId: string) => {
   }
 }
 
-export default { newNote, getAllNotes }
+const updateNote = async (noteId: string, payload: INote, userId: string) => {
+  try {
+    const note = await NoteModel.findOne({ _id: noteId, createdBy: userId });
+    if (!note) throw new Error('Note Not Found!');
+    // @ts-ignore
+    delete payload["_id"];
+    note.set(payload);
+    await note.save();
+    return
+  } catch (error) {
+    throw error
+  }
+}
+
+export default { newNote, getAllNotes,updateNote }

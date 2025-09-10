@@ -364,14 +364,13 @@ export const responseFormat = {
           "content": {
             "type": "string",
             "description": "Detailed section content with explanations, examples, or elaboration",
-            "maxLength": 500
+            "maxLength": 1000
           }
         },
         "required": ["heading", "content"],
         "additionalProperties": false
       },
       "minItems": 2,
-      "maxItems": 5
     },
     "language": {
       "type": "string",
