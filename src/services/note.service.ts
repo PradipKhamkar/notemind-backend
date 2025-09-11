@@ -64,6 +64,7 @@ const updateNote = async (noteId: string, payload: INote, userId: string) => {
     delete payload["_id"];
     note.set(payload);
     await note.save();
+    console.log('Updated Note',note)
     return
   } catch (error) {
     throw error

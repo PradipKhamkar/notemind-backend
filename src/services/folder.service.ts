@@ -12,6 +12,7 @@ const create = async (userId: string, name: string, icon?: string) => {
       updatedAt:newFolder.updatedAt
     }
   } catch (error) {
+    console.log('Error In Create Folder::',error)
     throw error
   }
 }
