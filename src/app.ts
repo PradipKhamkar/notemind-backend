@@ -13,7 +13,7 @@ import Authenticate from "./middleware/Authenticate";
 import fileRoute from "./routes/file.route";
 import folderRoute from "./routes/folder.route";
 
-app.use('/notes', Authenticate, noteRoute);
+app.use('/note', Authenticate, noteRoute);
 app.use('/auth', authRoute);
 app.use('/file', Authenticate, fileRoute);
 app.use('/folder', Authenticate, folderRoute);

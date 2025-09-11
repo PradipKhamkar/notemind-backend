@@ -4,5 +4,6 @@ const route = express.Router();
 
 route.get('/',noteController.getAllNotes);
 route.put('/',noteController.updateNote);
+route.delete('/:id',noteController.deleteNote);
 
 export default route

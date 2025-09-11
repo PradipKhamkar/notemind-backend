@@ -70,4 +70,15 @@ const updateNote = async (noteId: string, payload: INote, userId: string) => {
   }
 }
 
-export default { newNote, getAllNotes,updateNote }
+const deleteNote = async(noteId:string,userId:string)=>{
+  try {
+    const isNoteExit = await NoteModel.findOne({createdBy:userId,_id:noteId});
+    if(!isNoteExit) throw new Error("Note Not Found!");
+    await isNoteExit.deleteOne();
+    return
+  } catch (error) {
+    throw error
+  }
+}
+
+export default { newNote, getAllNotes,updateNote,deleteNote }

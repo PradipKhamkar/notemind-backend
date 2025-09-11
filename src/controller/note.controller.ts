@@ -28,4 +28,19 @@ const updateNote = async (request: Request, res: Response) => {
   }
 }
 
-export default { getAllNotes,updateNote }
+
+const deleteNote = async (request: Request, res: Response) => {
+  try {
+    // @ts-ignore
+    const userId = request.userId
+    console.log('Request Body',request.params.id)
+    await noteService.deleteNote(request.params.id,userId);
+    successResponse(res, "Note Deleted Successfully!",{});
+  } catch (error: any) {
+    console.log('Error In Delete Note', error)
+    errorResponse(res, error?.message || "Failed To Delete Note")
+  }
+}
+
+
+export default { getAllNotes,updateNote,deleteNote }
