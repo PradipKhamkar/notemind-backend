@@ -8,12 +8,15 @@ interface INewNotePayload {
     uploadId?: string
   }
 };
-
 interface INote {
   _id: string;
   title: string;
   folder?: string;
-  transcript: string;
+  transcript: {
+    speaker: string,
+    transcript: string;
+    duration: string;
+  }[];
   createdAt: string;
   updatedAt: string;
   createdBy: string;

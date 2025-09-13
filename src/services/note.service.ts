@@ -15,8 +15,8 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
 
     // Initialize Empty New Note 
     const notesData = {
-      transcript: "test transcript",
       language: "",
+      transcript: [],
       title: "",
       metaData: {},
       keyPoints: [],
@@ -33,6 +33,7 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     notesData["language"] = aiStructureOutput.language;
     notesData["keyPoints"] = aiStructureOutput.key_points;
     notesData["sections"] = aiStructureOutput.sections;
+    notesData["transcript"] = aiStructureOutput?.transcript || [];
 
     console.log('aiStructureOutput', aiStructureOutput);
     if (originalPath) notesData["source"]["link"] = originalPath;

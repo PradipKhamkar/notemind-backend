@@ -1,4 +1,4 @@
-import  { Schema, model } from "mongoose";
+import  mongoose, { Schema, model } from "mongoose";
 import { INote } from "../types/note.type";
 
 const SectionSchema = new Schema(
@@ -35,7 +35,7 @@ const NoteSchema = new Schema<INote>(
       required: true,
     },
     language: { type: String, required: true },
-    transcript: { type: String, required: true, trim: true },
+    transcript: { type:Schema.Types.Mixed},
     metaData: { type: Schema.Types.Mixed, default: {} },
   },
   { timestamps: true }
