@@ -58,28 +58,24 @@ const getAllNotes = async (userId: string) => {
 
 const updateNote = async (noteId: string, payload: INote, userId: string) => {
   try {
-    const note = await NoteModel.findOne({ _id: noteId, createdBy: userId });
-    if (!note) throw new Error('Note Not Found!');
     // @ts-ignore
     delete payload["_id"];
-    note.set(payload);
-    await note.save();
-    console.log('Updated Note',note)
-    return
+    const updatedNote = NoteModel.findOneAndUpdate({ createdBy: userId, _id: userId }, payload, { returnDocument: "after" });
+    if (!updatedNote) throw new Error('Note Not Found!')
+    return updateNote
   } catch (error) {
     throw error
   }
 }
 
-const deleteNote = async(noteId:string,userId:string)=>{
+const deleteNote = async (noteId: string, userId: string) => {
   try {
-    const isNoteExit = await NoteModel.findOne({createdBy:userId,_id:noteId});
-    if(!isNoteExit) throw new Error("Note Not Found!");
-    await isNoteExit.deleteOne();
+    const note = await NoteModel.findByIdAndDelete({ createdBy: userId, _id: noteId });
+    if (!note) throw new Error("Note Not Found!");
     return
   } catch (error) {
     throw error
   }
 }
 
-export default { newNote, getAllNotes,updateNote,deleteNote }
+export default { newNote, getAllNotes, updateNote, deleteNote }

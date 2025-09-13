@@ -25,4 +25,21 @@ const remove = async (req: Request, res: Response) => {
 }
 
 
-export default {create,remove}
+
+const update = async (request: Request, res: Response) => {
+  try {
+     console.log('update folder payload::',request.body)
+    // @ts-ignore
+    const userId = request.userId
+    const folder = await folderService.update(request.body.folderId, request.body.data, userId);
+    successResponse(res, "Folder Updated Successfully!", folder, 200);
+  } catch (error: any) {
+    console.log('Error In Update Folder', error)
+    errorResponse(res, error?.message || "Failed To Folder")
+  }
+}
+
+
+
+
+export default {create,remove,update}
