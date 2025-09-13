@@ -330,7 +330,55 @@
 
 export const responseFormat = {
   "type": "object",
+  "required": ["title", "summary", "key_points", "sections", 'language'],
+  "if": {
+    "properties": {
+      "source_type": {
+        "enum": ["audio", "video", "youtube"]
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "transcript": {
+        "type": "array",
+        "description": "Structured transcript with speaker information, timestamps, and actual spoken text",
+        "items": {
+          "type": "object",
+          "properties": {
+            "speaker": {
+              "type": "string",
+              "description": "Name or identifier of the speaker (e.g., 'Host', 'Guest', 'Instructor', 'John Doe', 'Unknown Speaker')",
+              "maxLength": 100,
+              "examples": ["Host", "Guest", "Instructor", "John Smith", "Interviewer", "Speaker"]
+            },
+            "duration": {
+              "type": "string",
+              "description": "Timestamp when this speaker segment occurs in MM:SS or H:MM:SS format",
+              "pattern": "^([0-9]+:)?[0-5]?[0-9]:[0-5][0-9]$",
+              "examples": ["00:04", "1:02", "15:30", "1:01:23", "2:45:12"]
+            },
+            "transcript": {
+              "type": "string",
+              "description": "The actual spoken text by this speaker during this time period, cleaned of filler words and formatted properly",
+              "minLength": 10,
+              "maxLength": 200
+            }
+          },
+          "required": ["speaker", "duration", "transcript"],
+          "additionalProperties": false
+        },
+        "minItems": 1
+      }
+    },
+    "required": ["transcript"]
+  },
   "properties": {
+    "source_type": {
+      "type": "string",
+      "enum": ["youtube", "web", "pdf", "audio", "video"],
+      "description": "The type of source this note is generated from"
+    },
     "title": {
       "type": "string",
       "description": "Generate a clear, descriptive title (3-8 words) that captures the main topic",
@@ -384,7 +432,7 @@ export const responseFormat = {
             "maxLength": 100,
             "examples": ["Host", "Guest", "Instructor", "John Smith", "Interviewer", "Speaker"]
           },
-         "duration": {
+          "duration": {
             "type": "string",
             "description": "Timestamp when this speaker segment occurs in MM:SS or H:MM:SS format",
             "pattern": "^([0-9]+:)?[0-5]?[0-9]:[0-5][0-9]$",
@@ -407,7 +455,6 @@ export const responseFormat = {
       "description": "language of note"
     }
   },
-  "required": ["title", "summary", "key_points", "sections", 'language', 'transcript'],
-  "additionalProperties": false
+  "additionalProperties": false,
 }
 
