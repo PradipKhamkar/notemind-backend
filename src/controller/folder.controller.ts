@@ -13,4 +13,16 @@ const create = async (req: Request, res: Response) => {
 }
 
 
-export default {create}
+
+const remove = async (req: Request, res: Response) => {
+  try {
+    // @ts-ignore
+    const results = await folderService.remove(req.params.id,req.userId);
+    successResponse(res, "folder deleted successfully", results, 200)
+  } catch (error: any) {
+    errorResponse(res, error?.message || 'failed to deleted folder!',)
+  }
+}
+
+
+export default {create,remove}

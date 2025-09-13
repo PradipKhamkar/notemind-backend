@@ -17,5 +17,13 @@ const create = async (userId: string, name: string, icon?: string) => {
   }
 }
 
+const remove = async(folderId:string,userId:string)=>{
+  try {
+    const isFolder = await FolderModel.findOneAndDelete({_id:folderId,createdBy:userId});
+    return
+  } catch (error) {
+    throw error
+  }
+}
 
-export default {create}
+export default {create,remove}
