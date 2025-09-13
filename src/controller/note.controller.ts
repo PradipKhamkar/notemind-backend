@@ -20,8 +20,8 @@ const updateNote = async (request: Request, res: Response) => {
      console.log('update payload::',request.body)
     // @ts-ignore
     const userId = request.userId
-    const notes = await noteService.updateNote(request.body.noteId, request.body.data, userId);
-    successResponse(res, "Note Updated Successfully!", notes, 200);
+    const note = await noteService.updateNote(request.body.noteId, request.body.data, userId);
+    successResponse(res, "Note Updated Successfully!", note, 200);
   } catch (error: any) {
     console.log('Error In Update Note', error)
     errorResponse(res, error?.message || "Failed To Update Note")

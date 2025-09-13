@@ -60,9 +60,10 @@ const updateNote = async (noteId: string, payload: INote, userId: string) => {
   try {
     // @ts-ignore
     delete payload["_id"];
-    const updatedNote = NoteModel.findOneAndUpdate({ createdBy: userId, _id: userId }, payload, { returnDocument: "after" });
-    if (!updatedNote) throw new Error('Note Not Found!')
-    return updateNote
+    const note = await NoteModel.findOneAndUpdate({ createdBy: userId, _id: noteId }, payload, { returnDocument: "after" });
+    if (!note) throw new Error('Note Not Found!')
+    console.log('Updated Note::', note);
+    return note
   } catch (error) {
     throw error
   }
