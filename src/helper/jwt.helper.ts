@@ -13,7 +13,7 @@ export const generateRefreshToken = (payload: IRefreshTokenPayload) => {
 
 export const generateAccessToken = (payload: IRefreshTokenPayload) => {
   try {
-    const token = jwt.sign(payload, config.TOKENS.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(payload, config.TOKENS.ACCESS_TOKEN_SECRET);
     return token
   } catch (error) {
     throw error

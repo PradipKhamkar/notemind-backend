@@ -103,7 +103,6 @@ const translateNote = async (payload: INoteTranslatePayload, userId: string) => 
   try {
     const note = await NoteModel.findOne({ _id: payload.noteId, createdBy: userId });
     if (!note) throw new Error('note not found!');
-    console.log('generate note called!')
     const { sourceLanguage, targetLanguage } = payload.data
     const sourceNoteContent = note.data.find((d) => d.language === sourceLanguage);
     if (!sourceNoteContent) throw new Error('source content not found!');
@@ -126,6 +125,7 @@ const translateNote = async (payload: INoteTranslatePayload, userId: string) => 
       content: content
     }
   } catch (error) {
+    console.log('err',error)
     throw error
   }
 }
