@@ -452,7 +452,7 @@ export const responseFormat = {
     },
     "language": {
       "type": "string",
-      "description": "ISO 639-1 language code of the original content",
+      "description": "ISO 639-1 language code of note content generated",
       "examples": ["en", "es", "fr", "de", "hi", "ja", "ko", "zh", "ar", "pt", "ru", "it"]
     }
   },

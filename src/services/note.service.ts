@@ -31,7 +31,6 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     notesData.transcript = aiStructureOutput?.transcript || [];
     notesData.source = { type, link, uploadId }
 
-    console.log('aiStructureOutput', aiStructureOutput);
     if (originalPath) notesData["source"]["link"] = originalPath;
     if (fileId) await geminiHelper.deleteFile(fileId as string);
 
@@ -53,14 +52,38 @@ const getAllNotes = async (userId: string) => {
   }
 }
 
-const updateNote = async (noteId: string, payload: INote, userId: string) => {
+const updateNote = async (noteId: string, payload: Partial<INote>, userId: string) => {
   try {
-    // @ts-ignore
-    delete payload["_id"];
-    const note = await NoteModel.findOneAndUpdate({ createdBy: userId, _id: noteId }, payload, { returnDocument: "after" });
-    if (!note) throw new Error('Note Not Found!')
-    console.log('Updated Note::', note);
-    return note
+    const setOperations: any = {};
+    const arrayFilters: any[] = [];
+
+    // handle `data` updates (translations)
+    if (payload.data && Array.isArray(payload.data)) {
+      payload.data.forEach((entry, i) => {
+        setOperations[`data.$[elem${i}].content`] = entry.content;
+        arrayFilters.push({ [`elem${i}.language`]: entry.language });
+      });
+    }
+
+    // handle other top-level fields dynamically
+    Object.entries(payload).forEach(([key, value]) => {
+      if (key !== "data" && key !== "_id") {
+        setOperations[key] = value;
+      }
+    });
+
+    const note = await NoteModel.findOneAndUpdate(
+      { createdBy: userId, _id: noteId },
+      { $set: setOperations },
+      {
+        new: true,
+        arrayFilters: arrayFilters.length > 0 ? arrayFilters : undefined,
+      }
+    );
+
+    if (!note) throw new Error("Note not found!");
+    return note;
+
   } catch (error) {
     throw error
   }
@@ -97,7 +120,7 @@ const translateNote = async (payload: INoteTranslatePayload, userId: string) => 
     const content = { content: { keyPoints: key_points, sections, summary }, language: targetLanguage, }
     note.data = [...note.data, content];
     await note.save();
-    console.log('ai response',content)
+    console.log('ai response', content)
     return {
       updatedNote: note,
       content: content
