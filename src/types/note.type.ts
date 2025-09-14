@@ -1,19 +1,29 @@
-
 interface INewNotePayload {
   type: TSource;
   sourceData: {
     link?: string;
     fileId?: string;
     originalPath?: string;
-    uploadId?: string
-  }
-};
+    uploadId?: string;
+  };
+}
+export interface INoteContent {
+  language: string;
+  content: {
+    summary: string;
+    keyPoints: string[];
+    sections: {
+      heading: string;
+      content: string;
+    }[];
+  };
+}
 interface INote {
   _id: string;
   title: string;
   folder?: string;
   transcript: {
-    speaker: string,
+    speaker: string;
     transcript: string;
     duration: string;
   }[];
@@ -24,17 +34,20 @@ interface INote {
     type: string;
     link?: string;
     text?: string;
+    uploadId?: string
   };
-  summary: string;
-  keyPoints: string[];
-  sections: {
-    heading: string;
-    content: string
-  }[];
-  language: string;
+  data: INoteContent[]
   metaData: object;
 }
 
-type TSource = "youtube" | "web" | "pdf" | "audio" | 'video'
+interface INoteTranslatePayload {
+  noteId: string;
+  data: {
+    targetLanguage: string;
+    sourceLanguage: string;
+  }
+}
 
-export { TSource, INewNotePayload, INote }
+type TSource = "youtube" | "web" | "pdf" | "audio" | "video";
+
+export { TSource, INewNotePayload, INote, INoteTranslatePayload };

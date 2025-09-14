@@ -1,13 +1,6 @@
-import  mongoose, { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import { INote } from "../types/note.type";
 
-const SectionSchema = new Schema(
-  {
-    heading: { type: String, required: true },
-    content: { type: String, required: true },
-  },
-  { _id: false }
-);
 
 const NoteSchema = new Schema<INote>(
   {
@@ -21,9 +14,10 @@ const NoteSchema = new Schema<INote>(
       link: { type: String },
       text: { type: String },
     },
-    summary: { type: String, required: true },
-    keyPoints: [{ type: String, required: true }],
-    sections: { type: [SectionSchema], required: true },
+    data: {
+      type: Schema.Types.Mixed,
+      required: true
+    },
     folder: {
       type: Schema.Types.ObjectId,
       ref: "Folder",
@@ -34,8 +28,7 @@ const NoteSchema = new Schema<INote>(
       ref: "User",
       required: true,
     },
-    language: { type: String, required: true },
-    transcript: { type:Schema.Types.Mixed},
+    transcript: { type: Schema.Types.Mixed },
     metaData: { type: Schema.Types.Mixed, default: {} },
   },
   { timestamps: true }

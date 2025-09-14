@@ -14,7 +14,6 @@ const getAllNotes = async (request: Request, res: Response) => {
   }
 }
 
-
 const updateNote = async (request: Request, res: Response) => {
   try {
      console.log('update payload::',request.body)
@@ -27,7 +26,6 @@ const updateNote = async (request: Request, res: Response) => {
     errorResponse(res, error?.message || "Failed To Update Note")
   }
 }
-
 
 const deleteNote = async (request: Request, res: Response) => {
   try {
@@ -42,5 +40,17 @@ const deleteNote = async (request: Request, res: Response) => {
   }
 }
 
+const translateNote = async (request: Request, res: Response) => {
+  try {
+    console.log('Payload for translate',request.body)
+    // @ts-ignore
+    const userId = request.userId
+    const note = await noteService.translateNote(request.body,userId);
+    successResponse(res, "Note Translate Successfully!", note, 200);
+  } catch (error: any) {
+    console.log('Error In Translate Note', error)
+    errorResponse(res, error?.message || "Failed To Translate Note")
+  }
+}
 
-export default { getAllNotes,updateNote,deleteNote }
+export default { getAllNotes,updateNote,deleteNote,translateNote }

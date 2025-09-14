@@ -452,9 +452,66 @@ export const responseFormat = {
     },
     "language": {
       "type": "string",
-      "description": "language of note"
+      "description": "ISO 639-1 language code of the original content",
+      "examples": ["en", "es", "fr", "de", "hi", "ja", "ko", "zh", "ar", "pt", "ru", "it"]
     }
   },
   "additionalProperties": false,
 }
 
+export const translate = {
+  "type": "object",
+  "description": "translation schema for converting notes content to target language",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Translate the original title into target language while maintaining its descriptive nature and clarity"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Translate the original summary into target language while preserving meaning and context."
+    },
+    "key_points": {
+      "type": "array",
+      "description": "Translate all key points into target language while maintaining their actionable and memorable nature. Preserve technical terms and concepts appropriately.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 3
+    },
+    "sections": {
+      "type": "array",
+      "description": "Translate all section content into target language while preserving original structure and organization. Maintain technical accuracy and natural flow.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "heading": {
+            "type": "string",
+            "description": "Translate section heading into target language, keeping it clear and concise (2-5 words equivalent)"
+          },
+          "content": {
+            "type": "string",
+            "description": "Translate detailed section content into target language while preserving explanations, examples, and technical accuracy. Ensure natural flow in target language."
+          }
+        },
+        "required": ["heading", "content"],
+        "additionalProperties": false
+      },
+      "minItems": 2
+    },
+    "source_language": {
+      "type": "string",
+      "description": "ISO 639-1 language code of the original content",
+      "examples": ["en", "es", "fr", "de", "hi", "ja", "ko", "zh", "ar", "pt", "ru", "it"]
+    },
+    "target_language": {
+      "type": "string",
+      "description": "ISO 639-1 language code of the translated content",
+      "examples": ["en", "es", "fr", "de", "hi", "ja", "ko", "zh", "ar", "pt", "ru", "it"]
+    }
+  },
+  "required": ["title", "summary", "key_points", "sections", "source_language", "target_language"],
+  "additionalProperties": false
+}
+
+export default { translate }

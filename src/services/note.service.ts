@@ -1,9 +1,9 @@
-import { INewNotePayload, INote } from "../types/note.type";
+import { INewNotePayload, INote, INoteTranslatePayload } from "../types/note.type";
 import geminiHelper from "../helper/gemini.helper";
 import promptConstant from "../constants/prompt.constant";
 import { NoteModel } from "../models/note.model";
 import FolderModel from "../models/folder.model";
-import { responseFormat } from "../constants/structure.constant";
+import structureConstant, { responseFormat } from "../constants/structure.constant";
 
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
@@ -13,27 +13,23 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     if (link) messages.push(geminiHelper.getFileURLMessage(link));
     const system = promptConstant.systemPrompt[type];
 
-    // Initialize Empty New Note 
-    const notesData = {
-      language: "",
-      transcript: [],
-      title: "",
-      metaData: {},
-      keyPoints: [],
-      summary: "",
-      sections: [],
-      source: { type, link, uploadId }
-    };
+    // @ts-ignore
+    const notesData: INote = {}
 
     const res = await geminiHelper.getNotesResponse(system, messages, responseFormat);
     const aiStructureOutput = JSON.parse(res as string);
     notesData["title"] = aiStructureOutput.title;
-    notesData["summary"] = aiStructureOutput.summary;
-    notesData["metaData"] = aiStructureOutput?.metaData;
-    notesData["language"] = aiStructureOutput.language;
-    notesData["keyPoints"] = aiStructureOutput.key_points;
-    notesData["sections"] = aiStructureOutput.sections;
-    notesData["transcript"] = aiStructureOutput?.transcript || [];
+    notesData.data = [{
+      language: aiStructureOutput.language,
+      content: {
+        keyPoints: aiStructureOutput.key_points,
+        sections: aiStructureOutput.sections,
+        summary: aiStructureOutput.summary
+      }
+    }];
+    notesData.metaData = aiStructureOutput?.metaData;
+    notesData.transcript = aiStructureOutput?.transcript || [];
+    notesData.source = { type, link, uploadId }
 
     console.log('aiStructureOutput', aiStructureOutput);
     if (originalPath) notesData["source"]["link"] = originalPath;
@@ -80,4 +76,35 @@ const deleteNote = async (noteId: string, userId: string) => {
   }
 }
 
-export default { newNote, getAllNotes, updateNote, deleteNote }
+const translateNote = async (payload: INoteTranslatePayload, userId: string) => {
+  try {
+    const note = await NoteModel.findOne({ _id: payload.noteId, createdBy: userId });
+    if (!note) throw new Error('note not found!');
+    console.log('generate note called!')
+    const { sourceLanguage, targetLanguage } = payload.data
+    const sourceNoteContent = note.data.find((d) => d.language === sourceLanguage);
+    if (!sourceNoteContent) throw new Error('source content not found!');
+
+    const messages = [{
+      text: `
+      noteData:${JSON.stringify(sourceNoteContent)}
+      source_language:${sourceLanguage}
+      target_language:${targetLanguage}`
+    }];
+
+    const res = await geminiHelper.getNotesResponse(promptConstant.translateNote, messages, structureConstant.translate);
+    const { key_points, sections, summary } = JSON.parse(res as string);
+    const content = { content: { keyPoints: key_points, sections, summary }, language: targetLanguage, }
+    note.data = [...note.data, content];
+    await note.save();
+    console.log('ai response',content)
+    return {
+      updatedNote: note,
+      content: content
+    }
+  } catch (error) {
+    throw error
+  }
+}
+
+export default { newNote, getAllNotes, updateNote, deleteNote, translateNote }

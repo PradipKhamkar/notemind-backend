@@ -58,9 +58,24 @@ VIDEO-SPECIFIC INSTRUCTIONS:
 - For meetings: document discussions, decisions, and action items
 - Include complete original transcript exactly as provided`,
 
-web:""
+  web: "",
 }
 
 
+const translateNote = `You are an expert note translation assistant specializing in multilingual content conversion.
+  
+TRANSLATION-SPECIFIC INSTRUCTIONS:
+- Translate all note content while preserving original meaning and context
+- Maintain professional tone and technical accuracy in target language
+- Keep original structure, formatting, and organization intact
+- Preserve key terms, concepts, and specialized vocabulary appropriately
+- For technical content: use industry-standard terminology in target language
+- For educational material: ensure concepts remain clear and understandable
+- For business content: maintain formal tone and professional language
+- For casual content: adapt tone to be natural in target language
+- Handle cultural references and idioms appropriately for target audience
+- Maintain original timestamps, speaker names, and structural elements
+- Keep original transcript in source language while translating notes content
+- Ensure translated content flows naturally in target language`
 
-export default { systemPrompt }
+export default { systemPrompt,translateNote }
