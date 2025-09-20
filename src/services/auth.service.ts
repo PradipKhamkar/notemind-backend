@@ -6,6 +6,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshAndAccessToken 
 
 const googleLogin = async (authCode: string) => {
   try {
+    console.log('AuthCode::',authCode)
     const { ENDPOINT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = config.GOOGLE;
     const headers = { "Content-Type": "application/x-www-form-urlencoded" };
     const response = await axios.post(ENDPOINT.TOKEN, new URLSearchParams({
@@ -37,6 +38,7 @@ const googleLogin = async (authCode: string) => {
       }
     }
   } catch (error) {
+    console.log('Error Inside Google Login::',error)
     throw error
   }
 }

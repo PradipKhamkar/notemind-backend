@@ -2,9 +2,6 @@
 #
 .DS_Store
 
-# Xcode
-#
-build/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -23,8 +20,6 @@ DerivedData
 **/.xcode.env.local
 
 # Android/IntelliJ
-#
-build/
 .idea
 .gradle
 local.properties
@@ -74,3 +69,4 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+build/
