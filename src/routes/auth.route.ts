@@ -6,5 +6,6 @@ const router = Router();
 router.post('/google', authController.googleAuth);
 router.post('/new-accessToken', authController.getNewAccessToken);
 router.get('/logged-user', Authenticate, authController.getLoggedUser);
+router.delete('/', Authenticate, authController.deleteAccount);
 
 export default router

@@ -31,5 +31,15 @@ const getLoggedUser = async (req: any, res: Response) => {
   }
 };
 
+const deleteAccount = async (req: any, res: Response) => {
+  try {
+    const result = await userService.deleteAccount(req.userId);
+    successResponse(res, "success", result, responseStatusCode.OK);
+  } catch (error: any) {
+    errorResponse(res, error?.messages);
+  }
+};
 
-export default { googleAuth, getNewAccessToken, getLoggedUser };
+
+
+export default { googleAuth, getNewAccessToken, getLoggedUser,deleteAccount };
