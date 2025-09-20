@@ -4,10 +4,12 @@
   "description": "",
   "license": "ISC",
   "author": "pradip khamkar",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -r dotenv/config ./src/index.ts"
+    "dev": "nodemon -r dotenv/config ./src/index.ts",
+    "build": "tsc",
+    "start": "node build/index.js"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
