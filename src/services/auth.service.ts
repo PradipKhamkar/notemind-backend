@@ -74,4 +74,14 @@ const getUserById = async (userId: string) => {
   }
 }
 
-export default {googleLogin,getNewAccessToken,getUserById}
+const deleteAccount = async(userId:string)=>{
+try {
+await UserModel.findByIdAndDelete(userId);
+return {
+  messages:"user deleted successfully!"
+}
+} catch (error) {
+  throw error
+}
+}
+export default {googleLogin,getNewAccessToken,getUserById,deleteAccount}
