@@ -16,8 +16,30 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     // @ts-ignore
     const notesData: INote = {}
 
-    const res = await geminiHelper.getNotesResponse(system, messages, responseFormat);
-    const aiStructureOutput = JSON.parse(res as string);
+    // handle call model
+    let attempts: number = 0;
+    let aiStructureOutput: any = {};
+    const MAX_RETRIES = 2;
+
+    while (attempts < MAX_RETRIES) {
+      attempts++
+      console.log('Attempts Count::', attempts);
+      try {
+        const res = await geminiHelper.getNotesResponse(system, messages, responseFormat);
+        aiStructureOutput = JSON.parse(res as string);
+        break;
+      } catch (error) {
+        console.log("Error In Note Creating!", JSON.stringify(error))
+        if (error instanceof SyntaxError) {
+          if (attempts >= MAX_RETRIES) throw new Error("Failed To Parse Structure Output!")
+          console.warn(`Attempt ${attempts}: JSON parse failed, retrying with same model...`);
+          continue; // retry same model
+        }
+        throw error
+      }
+    };
+
+    console.log('Final Results::', aiStructureOutput)
     notesData["title"] = aiStructureOutput.title;
     notesData.data = [{
       language: aiStructureOutput.language,
@@ -28,7 +50,7 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
       }
     }];
     notesData.metaData = aiStructureOutput?.metaData;
-    notesData.transcript = aiStructureOutput?.transcript || [];
+    // notesData.transcript = aiStructureOutput?.transcript || [];
     notesData.source = { type, link, uploadId }
 
     if (originalPath) notesData["source"]["link"] = originalPath;
@@ -125,7 +147,7 @@ const translateNote = async (payload: INoteTranslatePayload, userId: string) => 
       content: content
     }
   } catch (error) {
-    console.log('err',error)
+    console.log('err', error)
     throw error
   }
 }
