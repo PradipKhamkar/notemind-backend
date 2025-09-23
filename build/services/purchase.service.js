@@ -38,7 +38,7 @@ const verifyPurchase = (packageName, subscriptionId, purchaseToken) => __awaiter
 });
 const createPurchase = (userId, purchaseToken, orderId, productId, planType) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const verifiedInfo = yield verifyPurchase(config_1.default.APPLICATION_PACKAGE_NAME, productId, purchaseToken);
+        const verifiedInfo = yield verifyPurchase('com.pradip.notemind', productId, purchaseToken);
         if (!verifiedInfo)
             throw new Error("failed to verify purchase!");
         const userPurchase = yield purchase_model_1.default.findOne({

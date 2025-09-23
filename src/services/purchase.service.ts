@@ -36,7 +36,7 @@ const createPurchase = async (
   planType: "weekly" | "yearly"
 ) => {
   try {
-    const verifiedInfo = await verifyPurchase(config.APPLICATION_PACKAGE_NAME as string,productId,purchaseToken);
+    const verifiedInfo = await verifyPurchase('com.pradip.notemind',productId,purchaseToken);
     if (!verifiedInfo) throw new Error("failed to verify purchase!");
 
     const userPurchase = await PurchaseModel.findOne({
