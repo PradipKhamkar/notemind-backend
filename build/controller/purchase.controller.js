@@ -23,6 +23,7 @@ const createPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function*
         (0, response_helper_1.successResponse)(res, 'purchase created successfully!', purchaseRes);
     }
     catch (error) {
+        console.log('Failed Purchase', error);
         (0, response_helper_1.errorResponse)(res);
     }
 });

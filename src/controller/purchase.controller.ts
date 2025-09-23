@@ -10,6 +10,7 @@ const createPurchase = async(req:Request,res:Response)=>{
     const purchaseRes = await purchaseService.createPurchase(userId,req.body.purchaseToken,req.body.orderId,req.body.productId,req.body.planType);
     successResponse(res,'purchase created successfully!',purchaseRes);
   } catch (error) {
+    console.log('Failed Purchase',error)
     errorResponse(res)
   }
 }

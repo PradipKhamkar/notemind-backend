@@ -18,6 +18,6 @@ app.use('/note', Authenticate, noteRoute);
 app.use('/auth', authRoute);
 app.use('/file', Authenticate, fileRoute);
 app.use('/folder', Authenticate, folderRoute);
-app.use('/purchase', purchaseRoute);
+app.use('/purchase', Authenticate, purchaseRoute);
 
 export default httpServer;
