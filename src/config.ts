@@ -9,7 +9,8 @@ const config = {
         ENDPOINT: {
             TOKEN: 'https://oauth2.googleapis.com/token',
             USERINFO: 'https://www.googleapis.com/oauth2/v1/userinfo?access_token={{access_token}}'
-        }
+        },
+        SERVICE_ACCOUNT:env.GOOGLE_SERVICE_ACCOUNT
     },
     DB: {
         DATABASE_NAME: env.DATABASE_NAME,

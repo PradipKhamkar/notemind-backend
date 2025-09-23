@@ -12,10 +12,12 @@ import authRoute from "./routes/auth.route";
 import Authenticate from "./middleware/Authenticate";
 import fileRoute from "./routes/file.route";
 import folderRoute from "./routes/folder.route";
+import purchaseRoute from "./routes/purchase.route";
 
 app.use('/note', Authenticate, noteRoute);
 app.use('/auth', authRoute);
 app.use('/file', Authenticate, fileRoute);
 app.use('/folder', Authenticate, folderRoute);
+app.use('/purchase', purchaseRoute);
 
 export default httpServer;
