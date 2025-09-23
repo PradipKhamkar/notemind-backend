@@ -38,7 +38,8 @@ const verifyPurchase = (packageName, subscriptionId, purchaseToken) => __awaiter
 });
 const createPurchase = (userId, purchaseToken, orderId, productId, planType) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const verifiedInfo = yield verifyPurchase('com.pradip.notemind', productId, purchaseToken);
+        const packageName = "com.pradip.notemind";
+        const verifiedInfo = yield verifyPurchase(packageName, productId, purchaseToken);
         if (!verifiedInfo)
             throw new Error("failed to verify purchase!");
         const userPurchase = yield purchase_model_1.default.findOne({
@@ -52,6 +53,7 @@ const createPurchase = (userId, purchaseToken, orderId, productId, planType) => 
         const { autoRenewing, expiryTimeMillis, startTimeMillis, priceAmountMicros, priceCurrencyCode, } = verifiedInfo;
         const newPurchase = yield purchase_model_1.default.create({
             orderId,
+            packageName,
             purchaseToken,
             productId,
             planType,
@@ -68,7 +70,7 @@ const createPurchase = (userId, purchaseToken, orderId, productId, planType) => 
         return newPurchase;
     }
     catch (error) {
-        console.log('Error In Purchase::', JSON.stringify(error));
+        console.log("Error In Purchase::", JSON.stringify(error));
         throw error;
     }
 });
