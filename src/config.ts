@@ -25,8 +25,9 @@ const config = {
     },
     TOKENS: {
     ACCESS_TOKEN_SECRET: env.ACCESS_TOKEN_SECRET || "",
-    REFRESH_TOKEN_SECRET: env.REFRESH_TOKEN_SECRET || ""
+    REFRESH_TOKEN_SECRET: env.REFRESH_TOKEN_SECRET || "",
   },
+    APPLICATION_PACKAGE_NAME:env.APPLICATION_PACKAGE_NAME
 }
 
 export default config;

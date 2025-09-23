@@ -1,6 +1,5 @@
 import config from "../config";
 import { google } from "googleapis";
-import { IPurchase } from "../types/user.type";
 import PurchaseModel from "../models/purchase.model";
 const androidpublisher = google.androidpublisher("v3");
 
@@ -31,18 +30,13 @@ const verifyPurchase = async (
 
 const createPurchase = async (
   userId: string,
-  packageName: string,
   purchaseToken: string,
   orderId: string,
   productId: string,
   planType: "weekly" | "yearly"
 ) => {
   try {
-    const verifiedInfo = await verifyPurchase(
-      packageName,
-      orderId,
-      purchaseToken
-    );
+    const verifiedInfo = await verifyPurchase(config.APPLICATION_PACKAGE_NAME as string,orderId,purchaseToken);
     if (!verifiedInfo) throw new Error("failed to verify purchase!");
 
     const userPurchase = await PurchaseModel.findOne({
@@ -62,7 +56,6 @@ const createPurchase = async (
     } = verifiedInfo;
     const newPurchase = await PurchaseModel.create({
       orderId,
-      packageName,
       purchaseToken,
       productId,
       planType,
