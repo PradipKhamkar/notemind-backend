@@ -20,5 +20,5 @@ server_1.app.use('/note', Authenticate_1.default, note_route_1.default);
 server_1.app.use('/auth', auth_route_1.default);
 server_1.app.use('/file', Authenticate_1.default, file_route_1.default);
 server_1.app.use('/folder', Authenticate_1.default, folder_route_1.default);
-server_1.app.use('/purchase', purchase_route_1.default);
+server_1.app.use('/purchase', Authenticate_1.default, purchase_route_1.default);
 exports.default = server_1.httpServer;
