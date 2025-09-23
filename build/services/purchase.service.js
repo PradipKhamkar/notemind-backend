@@ -68,6 +68,7 @@ const createPurchase = (userId, purchaseToken, orderId, productId, planType) => 
         return newPurchase;
     }
     catch (error) {
+        console.log('Error In Purchase::', JSON.stringify(error));
         throw error;
     }
 });

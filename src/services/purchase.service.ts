@@ -71,6 +71,7 @@ const createPurchase = async (
     });
     return newPurchase;
   } catch (error) {
+    console.log('Error In Purchase::',JSON.stringify(error))
     throw error;
   }
 };
