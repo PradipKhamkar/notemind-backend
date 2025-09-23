@@ -5,7 +5,7 @@ import purchaseService from "../services/purchase.service"
 const createPurchase = async(req:Request,res:Response)=>{
   try {
     // @ts-ignore
-    const userId = request.userId
+    const userId = req.userId
     console.log('PAYLOAD DATA FOR CREATE PURCHASE::',req.body)
     const purchaseRes = await purchaseService.createPurchase(userId,req.body.purchaseToken,req.body.orderId,req.body.productId,req.body.planType);
     successResponse(res,'purchase created successfully!',purchaseRes);
