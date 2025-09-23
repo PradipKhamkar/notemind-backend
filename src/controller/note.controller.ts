@@ -16,7 +16,6 @@ const getAllNotes = async (request: Request, res: Response) => {
 
 const updateNote = async (request: Request, res: Response) => {
   try {
-     console.log('update payload::',request.body)
     // @ts-ignore
     const userId = request.userId
     const note = await noteService.updateNote(request.body.noteId, request.body.data, userId);
