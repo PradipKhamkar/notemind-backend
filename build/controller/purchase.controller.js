@@ -17,7 +17,7 @@ const purchase_service_1 = __importDefault(require("../services/purchase.service
 const createPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // @ts-ignore
-        const userId = request.userId;
+        const userId = req.userId;
         console.log('PAYLOAD DATA FOR CREATE PURCHASE::', req.body);
         const purchaseRes = yield purchase_service_1.default.createPurchase(userId, req.body.purchaseToken, req.body.orderId, req.body.productId, req.body.planType);
         (0, response_helper_1.successResponse)(res, 'purchase created successfully!', purchaseRes);
