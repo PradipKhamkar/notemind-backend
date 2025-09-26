@@ -16,11 +16,12 @@ const config_1 = __importDefault(require("../config"));
 const googleapis_1 = require("googleapis");
 const purchase_model_1 = __importDefault(require("../models/purchase.model"));
 const androidpublisher = googleapis_1.google.androidpublisher("v3");
+const packageName = "com.pradip.notemind";
 const auth = new googleapis_1.google.auth.GoogleAuth({
     credentials: JSON.parse(config_1.default.GOOGLE.SERVICE_ACCOUNT),
     scopes: ["https://www.googleapis.com/auth/androidpublisher"],
 });
-const verifyPurchase = (packageName, subscriptionId, purchaseToken) => __awaiter(void 0, void 0, void 0, function* () {
+const verifyPurchaseWithGoogle = (subscriptionId, purchaseToken) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield auth.getClient();
         const result = yield androidpublisher.purchases.subscriptions.get({
@@ -38,19 +39,17 @@ const verifyPurchase = (packageName, subscriptionId, purchaseToken) => __awaiter
 });
 const createPurchase = (userId, purchaseToken, orderId, productId, planType) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const packageName = "com.pradip.notemind";
-        const verifiedInfo = yield verifyPurchase(packageName, productId, purchaseToken);
-        if (!verifiedInfo)
+        const verifiedInfo = yield verifyPurchaseWithGoogle(productId, purchaseToken);
+        if (!verifiedInfo || !verifiedInfo.expiryTimeMillis)
             throw new Error("failed to verify purchase!");
-        const userPurchase = yield purchase_model_1.default.findOne({
-            createdBy: userId,
-            status: "active",
-        });
+        const { autoRenewing, expiryTimeMillis, startTimeMillis, priceAmountMicros, priceCurrencyCode, } = verifiedInfo;
+        if (parseInt(expiryTimeMillis) <= Date.now())
+            throw new Error('Purchase Token Expired!');
+        const userPurchase = yield purchase_model_1.default.findOne({ createdBy: userId, status: "active" });
         if (userPurchase) {
             userPurchase.status = "expired";
             yield userPurchase.save();
         }
-        const { autoRenewing, expiryTimeMillis, startTimeMillis, priceAmountMicros, priceCurrencyCode, } = verifiedInfo;
         const newPurchase = yield purchase_model_1.default.create({
             orderId,
             packageName,
@@ -70,7 +69,30 @@ const createPurchase = (userId, purchaseToken, orderId, productId, planType) => 
         return newPurchase;
     }
     catch (error) {
-        console.log("Error In Purchase::", JSON.stringify(error));
+        console.log("Error Create In Purchase::", JSON.stringify(error));
+        throw error;
+    }
+});
+const verifyPurchase = (userId, purchaseToken) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const purchaseInfo = yield purchase_model_1.default.findOne({ createdBy: userId, purchaseToken: purchaseToken }).select('-packageName');
+        if (!purchaseInfo)
+            throw new Error('Invalid Purchase Token!');
+        // verify with google
+        const isValidToken = yield verifyPurchaseWithGoogle(purchaseInfo.productId, purchaseToken);
+        if (!isValidToken || !isValidToken.expiryTimeMillis)
+            throw new Error("failed to verify purchase!");
+        // check expiry
+        if (parseInt(isValidToken.expiryTimeMillis) <= Date.now())
+            purchaseInfo.status = "expired";
+        else
+            purchaseInfo.status = "active";
+        yield purchaseInfo.save();
+        console.log('VerifiedPurchaseInfo::', purchaseInfo);
+        return purchaseInfo;
+    }
+    catch (error) {
+        console.log('Error In Verify Purchase', JSON.stringify(error));
         throw error;
     }
 });

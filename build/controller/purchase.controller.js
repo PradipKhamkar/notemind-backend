@@ -27,4 +27,17 @@ const createPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function*
         (0, response_helper_1.errorResponse)(res);
     }
 });
-exports.default = { createPurchase };
+const verifyPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // @ts-ignore
+        const userId = req.userId;
+        console.log('PAYLOAD DATA FOR VERIFY PURCHASE::', req.body);
+        const purchaseRes = yield purchase_service_1.default.verifyPurchase(userId, req.body.purchaseToken);
+        (0, response_helper_1.successResponse)(res, 'purchase verified successfully!', purchaseRes);
+    }
+    catch (error) {
+        console.log('Failed Verify Purchase', error);
+        (0, response_helper_1.errorResponse)(res);
+    }
+});
+exports.default = { createPurchase, verifyPurchase };
