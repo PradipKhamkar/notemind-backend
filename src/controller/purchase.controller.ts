@@ -15,5 +15,19 @@ const createPurchase = async(req:Request,res:Response)=>{
   }
 }
 
+const verifyPurchase = async(req:Request,res:Response)=>{
+  try {
+    // @ts-ignore
+    const userId = req.userId
+    console.log('PAYLOAD DATA FOR VERIFY PURCHASE::',req.body)
+    const purchaseRes = await purchaseService.verifyPurchase(userId,req.body.purchaseToken);
+    successResponse(res,'purchase verified successfully!',purchaseRes);
+  } catch (error) {
+    console.log('Failed Verify Purchase',error)
+    errorResponse(res)
+  }
+}
 
-export default {createPurchase}
+
+
+export default {createPurchase,verifyPurchase}
