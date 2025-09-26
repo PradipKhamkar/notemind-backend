@@ -7,4 +7,5 @@ const express_1 = __importDefault(require("express"));
 const purchase_controller_1 = __importDefault(require("../controller/purchase.controller"));
 const route = express_1.default.Router();
 route.post('/', purchase_controller_1.default.createPurchase);
+route.post('/verify', purchase_controller_1.default.verifyPurchase);
 exports.default = route;
