@@ -4,9 +4,29 @@ import promptConstant from "../constants/prompt.constant";
 import { NoteModel } from "../models/note.model";
 import FolderModel from "../models/folder.model";
 import structureConstant, { responseFormat } from "../constants/structure.constant";
+import { UserModel } from "../models/user.model";
+import purchaseService from "./purchase.service";
+import config from "../config";
 
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
+
+    // check user note quote
+    const userInfo = await UserModel.findById(userId).select('freeQuotaExceed');
+    if (!userInfo) throw new Error('user not found!');
+    console.log('userInfo',userInfo)
+    if (userInfo.freeQuotaExceed) {
+      const purchase = await purchaseService.verifyPurchase(userId);
+      if (purchase?.status !== "active") throw new Error("subscription_need")
+    } else {
+      const createdNotes = await NoteModel.countDocuments({ createdBy: userId });
+      if (createdNotes >= config.FREE_NOTE_QUOTA) {
+        userInfo.freeQuotaExceed = true;
+        await userInfo.save();
+        throw new Error("free_quota_exceed")
+      }
+    }
+
     const { type, sourceData } = payload;
     const { link, fileId, originalPath, uploadId } = sourceData
     const messages = []

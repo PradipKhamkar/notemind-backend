@@ -8,7 +8,7 @@ const geminiClient = new GoogleGenAI({ apiKey: config.GOOGLE.GEMINI_API_KEY });
 const getNotesResponse = async (system: string, messages: any[], structureOutput: any) => {
   try {
     const res = await geminiClient.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
       config: {
         systemInstruction: {
           "parts": [

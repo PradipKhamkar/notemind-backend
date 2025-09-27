@@ -1,5 +1,6 @@
 import { Schema, model, Document } from "mongoose";
 import { IUser } from "../types/user.type";
+import config from "../config";
 
 
 const UserSchema = new Schema<IUser>(
@@ -21,6 +22,10 @@ const UserSchema = new Schema<IUser>(
       required: true,
       enum: ["google", "github", "facebook", "apple", "email", "other"],
     },
+    freeQuotaExceed:{
+      type:Boolean,
+      default:false
+    }
   },
   {
     timestamps: true,

@@ -20,7 +20,7 @@ const verifyPurchase = async(req:Request,res:Response)=>{
     // @ts-ignore
     const userId = req.userId
     console.log('PAYLOAD DATA FOR VERIFY PURCHASE::',req.body)
-    const purchaseRes = await purchaseService.verifyPurchase(userId,req.body.purchaseToken);
+    const purchaseRes = await purchaseService.verifyPurchase(userId);
     successResponse(res,'purchase verified successfully!',purchaseRes);
   } catch (error) {
     console.log('Failed Verify Purchase',error)

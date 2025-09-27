@@ -38,13 +38,13 @@ io.on("connect", (socket) => {
             socket.emit(noteJob.job_done, newNote);
         }
         catch (error) {
-            socket.emit(noteJob.job_failed, error);
+            socket.emit(noteJob.job_failed, error === null || error === void 0 ? void 0 : error.message);
         }
     }));
     socket.on(translate.job_added, (payload) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             socket.emit(translate.job_started);
-            console.log('new note event catch');
+            console.log('new translate event catch');
             const translatedNote = yield note_service_1.default.translateNote(payload, user._id);
             socket.emit(translate.job_added, translatedNote);
         }

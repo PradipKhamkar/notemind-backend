@@ -73,23 +73,25 @@ const createPurchase = (userId, purchaseToken, orderId, productId, planType) => 
         throw error;
     }
 });
-const verifyPurchase = (userId, purchaseToken) => __awaiter(void 0, void 0, void 0, function* () {
+const verifyPurchase = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const purchaseInfo = yield purchase_model_1.default.findOne({ createdBy: userId, purchaseToken: purchaseToken }).select('-packageName');
-        if (!purchaseInfo)
-            throw new Error('Invalid Purchase Token!');
+        const lastPurchase = yield purchase_model_1.default.findOne({ createdBy: userId }).sort({ createdAt: -1 }).select('-packageName');
+        console.log('lastPurchase', lastPurchase);
+        if (!lastPurchase)
+            return null;
         // verify with google
-        const isValidToken = yield verifyPurchaseWithGoogle(purchaseInfo.productId, purchaseToken);
+        const isValidToken = yield verifyPurchaseWithGoogle(lastPurchase.productId, lastPurchase.purchaseToken);
         if (!isValidToken || !isValidToken.expiryTimeMillis)
             throw new Error("failed to verify purchase!");
-        // check expiry
         if (parseInt(isValidToken.expiryTimeMillis) <= Date.now())
-            purchaseInfo.status = "expired";
-        else
-            purchaseInfo.status = "active";
-        yield purchaseInfo.save();
-        console.log('VerifiedPurchaseInfo::', purchaseInfo);
-        return purchaseInfo;
+            lastPurchase.status = "expired";
+        else {
+            lastPurchase.expiryDate = isValidToken.expiryTimeMillis;
+            lastPurchase.status = "active";
+        }
+        yield lastPurchase.save();
+        console.log('VerifiedPurchaseInfo::', lastPurchase);
+        return lastPurchase;
     }
     catch (error) {
         console.log('Error In Verify Purchase', JSON.stringify(error));

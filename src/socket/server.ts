@@ -26,15 +26,15 @@ io.on("connect", (socket) => {
       socket.emit(noteJob.job_started)
       const newNote = await noteService.newNote(user._id, payload);
       socket.emit(noteJob.job_done, newNote)
-    } catch (error) {
-      socket.emit(noteJob.job_failed, error)
+    } catch (error:any) {
+      socket.emit(noteJob.job_failed, error?.message)
     }
   });
 
   socket.on(translate.job_added, async (payload: INoteTranslatePayload) => {
     try {
       socket.emit(translate.job_started)
-      console.log('new note event catch');
+      console.log('new translate event catch');
       const translatedNote = await noteService.translateNote(payload, user._id);
       socket.emit(translate.job_added, translatedNote)
     } catch (error) {

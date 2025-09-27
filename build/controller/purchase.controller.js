@@ -32,7 +32,7 @@ const verifyPurchase = (req, res) => __awaiter(void 0, void 0, void 0, function*
         // @ts-ignore
         const userId = req.userId;
         console.log('PAYLOAD DATA FOR VERIFY PURCHASE::', req.body);
-        const purchaseRes = yield purchase_service_1.default.verifyPurchase(userId, req.body.purchaseToken);
+        const purchaseRes = yield purchase_service_1.default.verifyPurchase(userId);
         (0, response_helper_1.successResponse)(res, 'purchase verified successfully!', purchaseRes);
     }
     catch (error) {

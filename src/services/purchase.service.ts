@@ -73,24 +73,27 @@ const createPurchase = async (
   }
 };
 
-const verifyPurchase = async (userId: string, purchaseToken: string) => {
+const verifyPurchase = async (userId: string) => {
   try {
-    const purchaseInfo = await PurchaseModel.findOne({ createdBy: userId, purchaseToken: purchaseToken }).select('-packageName');
-    if (!purchaseInfo) throw new Error('Invalid Purchase Token!');
+    const lastPurchase = await PurchaseModel.findOne({ createdBy: userId }).sort({ createdAt: -1 }).select('-packageName');
+     console.log('lastPurchase',lastPurchase)
+    if (!lastPurchase) return null
 
     // verify with google
-    const isValidToken = await verifyPurchaseWithGoogle(purchaseInfo.productId, purchaseToken);
+    const isValidToken = await verifyPurchaseWithGoogle(lastPurchase.productId, lastPurchase.purchaseToken);
     if (!isValidToken || !isValidToken.expiryTimeMillis) throw new Error("failed to verify purchase!");
 
-    // check expiry
-    if (parseInt(isValidToken.expiryTimeMillis) <= Date.now()) purchaseInfo.status = "expired";
-    else purchaseInfo.status = "active";
-    await purchaseInfo.save();
+    if (parseInt(isValidToken.expiryTimeMillis) <= Date.now()) lastPurchase.status = "expired";
+    else {
+      lastPurchase.expiryDate = isValidToken.expiryTimeMillis;
+      lastPurchase.status = "active";
+    }
+    await lastPurchase.save();
 
-    console.log('VerifiedPurchaseInfo::',purchaseInfo);
-    return purchaseInfo
+    console.log('VerifiedPurchaseInfo::', lastPurchase);
+    return lastPurchase
   } catch (error) {
-    console.log('Error In Verify Purchase',JSON.stringify(error))
+    console.log('Error In Verify Purchase', JSON.stringify(error))
     throw error
   }
 }
