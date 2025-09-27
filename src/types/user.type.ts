@@ -5,6 +5,7 @@ export interface IUser {
   loginProvider: string;
   createdAt: string;       // ISO date string
   updatedAt: string;       // ISO date string
+  freeQuotaExceed:boolean;
 }
 
  export interface IPurchase{

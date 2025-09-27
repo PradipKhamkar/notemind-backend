@@ -6,7 +6,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshAndAccessToken 
 
 const googleLogin = async (authCode: string) => {
   try {
-    console.log('AuthCode::',authCode)
+    console.log('AuthCode::', authCode)
     const { ENDPOINT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = config.GOOGLE;
     const headers = { "Content-Type": "application/x-www-form-urlencoded" };
     const response = await axios.post(ENDPOINT.TOKEN, new URLSearchParams({
@@ -26,7 +26,7 @@ const googleLogin = async (authCode: string) => {
     if (!email) throw new Error('Email is missing');
     let user: IUser | null = null;
     user = await UserModel.findOne({ email });
-    if (!user) user = await UserModel.create({ loginProvider: "google", email, name });
+    if (!user) user = await UserModel.create({ loginProvider: "google", email, name, freeNoteQuota: config.FREE_NOTE_QUOTA });
     const accessToken = generateAccessToken({ userId: user._id });
     const refreshToken = generateRefreshToken({ userId: user._id });
     return {
@@ -35,10 +35,11 @@ const googleLogin = async (authCode: string) => {
       user: {
         name,
         email,
+        freeQuotaExceed: user.freeQuotaExceed
       }
     }
   } catch (error) {
-    console.log('Error Inside Google Login::',error)
+    console.log('Error Inside Google Login::', error)
     throw error
   }
 }
@@ -50,9 +51,9 @@ const getNewAccessToken = async (refreshToken: string) => {
     const isUserExit = await UserModel.findOne({ _id: decodedToken.userId });
     if (!isUserExit) throw new Error("User not found!");
     const newAccessToken = generateAccessToken({ userId: decodedToken.userId });
-    console.log('newAccessToken',newAccessToken)
+    console.log('newAccessToken', newAccessToken)
     return {
-      accessToken:newAccessToken
+      accessToken: newAccessToken
     };
   } catch (error) {
     throw error;
@@ -65,8 +66,9 @@ const getUserById = async (userId: string) => {
     if (!userInfo) throw new Error('User Not Found!')
     return {
       user: {
-        name: userInfo?.name,
-        email: userInfo?.email,
+        name: userInfo.name,
+        email: userInfo.email,
+        freeQuotaExceed: userInfo.freeQuotaExceed
       }
     }
   } catch (error) {
@@ -74,14 +76,14 @@ const getUserById = async (userId: string) => {
   }
 }
 
-const deleteAccount = async(userId:string)=>{
-try {
-await UserModel.findByIdAndDelete(userId);
-return {
-  messages:"user deleted successfully!"
+const deleteAccount = async (userId: string) => {
+  try {
+    await UserModel.findByIdAndDelete(userId);
+    return {
+      messages: "user deleted successfully!"
+    }
+  } catch (error) {
+    throw error
+  }
 }
-} catch (error) {
-  throw error
-}
-}
-export default {googleLogin,getNewAccessToken,getUserById,deleteAccount}
+export default { googleLogin, getNewAccessToken, getUserById, deleteAccount }
