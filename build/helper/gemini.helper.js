@@ -18,7 +18,7 @@ const geminiClient = new genai_1.GoogleGenAI({ apiKey: config_1.default.GOOGLE.G
 const getNotesResponse = (system, messages, structureOutput) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const res = yield geminiClient.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-2.5-flash",
             config: {
                 systemInstruction: {
                     "parts": [

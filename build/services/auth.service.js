@@ -38,7 +38,7 @@ const googleLogin = (authCode) => __awaiter(void 0, void 0, void 0, function* ()
         let user = null;
         user = yield user_model_1.UserModel.findOne({ email });
         if (!user)
-            user = yield user_model_1.UserModel.create({ loginProvider: "google", email, name });
+            user = yield user_model_1.UserModel.create({ loginProvider: "google", email, name, freeNoteQuota: config_1.default.FREE_NOTE_QUOTA });
         const accessToken = (0, jwt_helper_1.generateAccessToken)({ userId: user._id });
         const refreshToken = (0, jwt_helper_1.generateRefreshToken)({ userId: user._id });
         return {
@@ -47,6 +47,7 @@ const googleLogin = (authCode) => __awaiter(void 0, void 0, void 0, function* ()
             user: {
                 name,
                 email,
+                freeQuotaExceed: user.freeQuotaExceed
             }
         };
     }
@@ -80,8 +81,9 @@ const getUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error('User Not Found!');
         return {
             user: {
-                name: userInfo === null || userInfo === void 0 ? void 0 : userInfo.name,
-                email: userInfo === null || userInfo === void 0 ? void 0 : userInfo.email,
+                name: userInfo.name,
+                email: userInfo.email,
+                freeQuotaExceed: userInfo.freeQuotaExceed
             }
         };
     }

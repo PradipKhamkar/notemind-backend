@@ -20,6 +20,10 @@ const UserSchema = new mongoose_1.Schema({
         required: true,
         enum: ["google", "github", "facebook", "apple", "email", "other"],
     },
+    freeQuotaExceed: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true,
 });
