@@ -3,7 +3,7 @@ import config from "../config";
 const { CLOUD_NAME, API_KEY, API_SECRET, FOLDER_NAME } = config.CLOUDINARY;
 import { UploadedFile } from "express-fileupload";
 import geminiHelper from "../helper/gemini.helper";
-import FileModel from "../models/file.model";
+
 cloudinary.config({
   cloud_name: CLOUD_NAME,
   api_key: API_KEY,
@@ -36,25 +36,26 @@ const uploadFileOnCloudinary = async (file: UploadedFile) => {
 
 const uploadFile = async (file: UploadedFile, userId: string) => {
   try {
-    const cloudinaryResponse = await uploadFileOnCloudinary(file);
-    const { type, url, uploadId } = cloudinaryResponse;
-    const geminiFileResponse = await geminiHelper.uploadFile(url, type);
-    await FileModel.create({
-      createdBy: userId,
-      path: url,
-      uploadId: uploadId,
-      size: file.size,
-      name: file.name,
-      type: file.mimetype,
-    });
+    // const cloudinaryResponse = await uploadFileOnCloudinary(file);
+    // const { type, url, uploadId } = cloudinaryResponse;
+    // console.log('file::',file.data)
+    const geminiFileResponse = await geminiHelper.uploadFile(file, file.mimetype);
+    // await FileModel.create({
+    //   createdBy: userId,
+    //   // path: url,
+    //   // uploadId: uploadId,
+    //   size: file.size,
+    //   name: file.name,
+    //   type: file.mimetype,
+    // });
     return {
       tempFileId: geminiFileResponse.fileName,
       tempPath: geminiFileResponse.uri,
-      originalPath:cloudinaryResponse.url,
-      uploadId:cloudinaryResponse.uploadId
+      // originalPath:cloudinaryResponse.url,
+      // uploadId:cloudinaryResponse.uploadId
     };
   } catch (error) {
-    console.log('Error In File Uploading::', error)
+    console.log('Error In File Uploading::', JSON.stringify(error))
     throw error;
   }
 };

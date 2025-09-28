@@ -76,7 +76,6 @@ const createPurchase = async (
 const verifyPurchase = async (userId: string) => {
   try {
     const lastPurchase = await PurchaseModel.findOne({ createdBy: userId }).sort({ createdAt: -1 }).select('-packageName');
-     console.log('lastPurchase',lastPurchase)
     if (!lastPurchase) return null
 
     // verify with google
@@ -89,8 +88,6 @@ const verifyPurchase = async (userId: string) => {
       lastPurchase.status = "active";
     }
     await lastPurchase.save();
-
-    console.log('VerifiedPurchaseInfo::', lastPurchase);
     return lastPurchase
   } catch (error) {
     console.log('Error In Verify Purchase', JSON.stringify(error))

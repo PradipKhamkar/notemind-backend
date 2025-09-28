@@ -10,79 +10,61 @@ import config from "../config";
 
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
+    
+    // === Quota checks remain same ===
+    const userInfo = await UserModel.findById(userId).select("freeQuotaExceed");
+    if (!userInfo) throw new Error("user not found!");
 
-    // check user note quote
-    const userInfo = await UserModel.findById(userId).select('freeQuotaExceed');
-    if (!userInfo) throw new Error('user not found!');
-    console.log('userInfo',userInfo)
     if (userInfo.freeQuotaExceed) {
       const purchase = await purchaseService.verifyPurchase(userId);
-      if (purchase?.status !== "active") throw new Error("subscription_need")
+      if (purchase?.status !== "active") throw new Error("subscription_need");
     } else {
       const createdNotes = await NoteModel.countDocuments({ createdBy: userId });
       if (createdNotes >= config.FREE_NOTE_QUOTA) {
         userInfo.freeQuotaExceed = true;
         await userInfo.save();
-        throw new Error("free_quota_exceed")
+        throw new Error("free_quota_exceed");
       }
     }
 
+    // === Input prep ===
     const { type, sourceData } = payload;
-    const { link, fileId, originalPath, uploadId } = sourceData
-    const messages = []
+    const { link, fileId, originalPath, uploadId } = sourceData;
+    const messages = [];
     if (link) messages.push(geminiHelper.getFileURLMessage(link));
     const system = promptConstant.systemPrompt[type];
 
     // @ts-ignore
-    const notesData: INote = {}
-
-    // handle call model
-    let attempts: number = 0;
-    let aiStructureOutput: any = {};
-    const MAX_RETRIES = 2;
-
-    while (attempts < MAX_RETRIES) {
-      attempts++
-      console.log('Attempts Count::', attempts);
-      try {
-        const res = await geminiHelper.getNotesResponse(system, messages, responseFormat);
-        aiStructureOutput = JSON.parse(res as string);
-        break;
-      } catch (error) {
-        console.log("Error In Note Creating!", JSON.stringify(error))
-        if (error instanceof SyntaxError) {
-          if (attempts >= MAX_RETRIES) throw new Error("Failed To Parse Structure Output!")
-          console.warn(`Attempt ${attempts}: JSON parse failed, retrying with same model...`);
-          continue; // retry same model
-        }
-        throw error
-      }
-    };
-
-    console.log('Final Results::', aiStructureOutput)
+    const notesData: INote = {};
+    const aiStructureOutput = await geminiHelper.getNotesResponse(system,messages,responseFormat);
+    
+    // === Map response into DB schema ===
     notesData["title"] = aiStructureOutput.title;
-    notesData.data = [{
-      language: aiStructureOutput.language,
-      content: {
-        keyPoints: aiStructureOutput.key_points,
-        sections: aiStructureOutput.sections,
-        summary: aiStructureOutput.summary
-      }
-    }];
+    notesData.data = [
+      {
+        language: aiStructureOutput.language,
+        content: {
+          keyPoints: aiStructureOutput.key_points,
+          sections: aiStructureOutput.sections,
+          summary: aiStructureOutput.summary,
+        },
+      },
+    ];
     notesData.metaData = aiStructureOutput?.metaData;
-    // notesData.transcript = aiStructureOutput?.transcript || [];
-    notesData.source = { type, link, uploadId }
+    notesData.source = { type, link, uploadId };
 
     if (originalPath) notesData["source"]["link"] = originalPath;
     if (fileId) await geminiHelper.deleteFile(fileId as string);
 
-    const newNote = await NoteModel.create({ ...notesData, createdBy: userId })
+    // Save note
+    const newNote = await NoteModel.create({ ...notesData, createdBy: userId });
     return newNote;
   } catch (error) {
-    console.log('Error In Create Note', error)
-    throw error
+    console.log("Error In Create Note", error);
+    throw error;
   }
-}
+};
+
 
 const getAllNotes = async (userId: string) => {
   try {
