@@ -110,7 +110,7 @@ const getFileURLMessage = (fileUrl: string) => {
 const uploadFile = async (file: UploadedFile, type: string) => {
   const timeout = 10 * 60 * 1000; // 10 minutes
   const pollInterval = 10 * 1000; // 10 seconds
-  const uploadRetryDelays = [5_000, 15_000, 30_000]; // retry delays for upload (5s → 15s → 30s)
+  const uploadRetryDelays = [5_000, 15_000, 30_000, 60_000]; // retry delays for upload (5s → 15s → 30s)
 
   // Helper: wait function
   const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -140,9 +140,9 @@ const uploadFile = async (file: UploadedFile, type: string) => {
         throw err; // non-503 or max retries exceeded
       }
     }
+    console.log('After Uplaod::', uploadRes)
+    if (!uploadRes) throw new Error("Upload failed after retries.");
 
-    if (!uploadRes)throw new Error("Upload failed after retries.");
-  
     // ========== 2. Poll status ==========
     const fileId = uploadRes.name;
     const start = Date.now();
