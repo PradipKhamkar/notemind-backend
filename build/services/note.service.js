@@ -55,11 +55,10 @@ const purchase_service_1 = __importDefault(require("./purchase.service"));
 const config_1 = __importDefault(require("../config"));
 const newNote = (userId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // check user note quote
-        const userInfo = yield user_model_1.UserModel.findById(userId).select('freeQuotaExceed');
+        // === Quota checks remain same ===
+        const userInfo = yield user_model_1.UserModel.findById(userId).select("freeQuotaExceed");
         if (!userInfo)
-            throw new Error('user not found!');
-        console.log('userInfo', userInfo);
+            throw new Error("user not found!");
         if (userInfo.freeQuotaExceed) {
             const purchase = yield purchase_service_1.default.verifyPurchase(userId);
             if ((purchase === null || purchase === void 0 ? void 0 : purchase.status) !== "active")
@@ -73,6 +72,7 @@ const newNote = (userId, payload) => __awaiter(void 0, void 0, void 0, function*
                 throw new Error("free_quota_exceed");
             }
         }
+        // === Input prep ===
         const { type, sourceData } = payload;
         const { link, fileId, originalPath, uploadId } = sourceData;
         const messages = [];
@@ -81,52 +81,31 @@ const newNote = (userId, payload) => __awaiter(void 0, void 0, void 0, function*
         const system = prompt_constant_1.default.systemPrompt[type];
         // @ts-ignore
         const notesData = {};
-        // handle call model
-        let attempts = 0;
-        let aiStructureOutput = {};
-        const MAX_RETRIES = 2;
-        while (attempts < MAX_RETRIES) {
-            attempts++;
-            console.log('Attempts Count::', attempts);
-            try {
-                const res = yield gemini_helper_1.default.getNotesResponse(system, messages, structure_constant_1.responseFormat);
-                aiStructureOutput = JSON.parse(res);
-                break;
-            }
-            catch (error) {
-                console.log("Error In Note Creating!", JSON.stringify(error));
-                if (error instanceof SyntaxError) {
-                    if (attempts >= MAX_RETRIES)
-                        throw new Error("Failed To Parse Structure Output!");
-                    console.warn(`Attempt ${attempts}: JSON parse failed, retrying with same model...`);
-                    continue; // retry same model
-                }
-                throw error;
-            }
-        }
-        ;
-        console.log('Final Results::', aiStructureOutput);
+        const aiStructureOutput = yield gemini_helper_1.default.getNotesResponse(system, messages, structure_constant_1.responseFormat);
+        // === Map response into DB schema ===
         notesData["title"] = aiStructureOutput.title;
-        notesData.data = [{
+        notesData.data = [
+            {
                 language: aiStructureOutput.language,
                 content: {
                     keyPoints: aiStructureOutput.key_points,
                     sections: aiStructureOutput.sections,
-                    summary: aiStructureOutput.summary
-                }
-            }];
+                    summary: aiStructureOutput.summary,
+                },
+            },
+        ];
         notesData.metaData = aiStructureOutput === null || aiStructureOutput === void 0 ? void 0 : aiStructureOutput.metaData;
-        // notesData.transcript = aiStructureOutput?.transcript || [];
         notesData.source = { type, link, uploadId };
         if (originalPath)
             notesData["source"]["link"] = originalPath;
         if (fileId)
-            yield gemini_helper_1.default.deleteFile(fileId);
+            gemini_helper_1.default.deleteFile(fileId);
+        // Save note
         const newNote = yield note_model_1.NoteModel.create(Object.assign(Object.assign({}, notesData), { createdBy: userId }));
         return newNote;
     }
     catch (error) {
-        console.log('Error In Create Note', error);
+        console.log("Error In Create Note", error);
         throw error;
     }
 });

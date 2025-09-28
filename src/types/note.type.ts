@@ -49,5 +49,4 @@ interface INoteTranslatePayload {
 }
 
 type TSource = "youtube" | "web" | "pdf" | "audio" | "video";
-
 export { TSource, INewNotePayload, INote, INoteTranslatePayload };

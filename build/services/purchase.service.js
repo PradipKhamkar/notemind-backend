@@ -76,7 +76,6 @@ const createPurchase = (userId, purchaseToken, orderId, productId, planType) => 
 const verifyPurchase = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const lastPurchase = yield purchase_model_1.default.findOne({ createdBy: userId }).sort({ createdAt: -1 }).select('-packageName');
-        console.log('lastPurchase', lastPurchase);
         if (!lastPurchase)
             return null;
         // verify with google
@@ -90,7 +89,6 @@ const verifyPurchase = (userId) => __awaiter(void 0, void 0, void 0, function* (
             lastPurchase.status = "active";
         }
         yield lastPurchase.save();
-        console.log('VerifiedPurchaseInfo::', lastPurchase);
         return lastPurchase;
     }
     catch (error) {
