@@ -16,7 +16,6 @@ const cloudinary_1 = require("cloudinary");
 const config_1 = __importDefault(require("../config"));
 const { CLOUD_NAME, API_KEY, API_SECRET, FOLDER_NAME } = config_1.default.CLOUDINARY;
 const gemini_helper_1 = __importDefault(require("../helper/gemini.helper"));
-const file_model_1 = __importDefault(require("../models/file.model"));
 cloudinary_1.v2.config({
     cloud_name: CLOUD_NAME,
     api_key: API_KEY,
@@ -49,26 +48,27 @@ const uploadFileOnCloudinary = (file) => __awaiter(void 0, void 0, void 0, funct
 });
 const uploadFile = (file, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const cloudinaryResponse = yield uploadFileOnCloudinary(file);
-        const { type, url, uploadId } = cloudinaryResponse;
-        const geminiFileResponse = yield gemini_helper_1.default.uploadFile(url, type);
-        yield file_model_1.default.create({
-            createdBy: userId,
-            path: url,
-            uploadId: uploadId,
-            size: file.size,
-            name: file.name,
-            type: file.mimetype,
-        });
+        // const cloudinaryResponse = await uploadFileOnCloudinary(file);
+        // const { type, url, uploadId } = cloudinaryResponse;
+        // console.log('file::',file.data)
+        const geminiFileResponse = yield gemini_helper_1.default.uploadFile(file, file.mimetype);
+        // await FileModel.create({
+        //   createdBy: userId,
+        //   // path: url,
+        //   // uploadId: uploadId,
+        //   size: file.size,
+        //   name: file.name,
+        //   type: file.mimetype,
+        // });
         return {
             tempFileId: geminiFileResponse.fileName,
             tempPath: geminiFileResponse.uri,
-            originalPath: cloudinaryResponse.url,
-            uploadId: cloudinaryResponse.uploadId
+            // originalPath:cloudinaryResponse.url,
+            // uploadId:cloudinaryResponse.uploadId
         };
     }
     catch (error) {
-        console.log('Error In File Uploading::', error);
+        console.log('Error In File Uploading::', JSON.stringify(error));
         throw error;
     }
 });
