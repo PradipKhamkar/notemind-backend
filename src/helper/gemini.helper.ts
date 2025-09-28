@@ -12,7 +12,7 @@ const getNotesResponse = async (
   modelName: string = "gemini-2.5-flash-lite",
   retryConfig: IRetryConfig = {
     jsonRetries: 2,
-    apiRetryDelays: [50_000, 60_000],
+    apiRetryDelays: [30_000, 60_000],
     fallbackModel: "gemini-2.5-flash",
   }
 ) => {
@@ -68,40 +68,118 @@ const getFileURLMessage = (fileUrl: string) => {
   };
 };
 
+// const uploadFile = async (file: UploadedFile, type: string) => {
+//   try {
+//     // const pdfBuffer = await fetch(fileURL).then((response) => response.arrayBuffer());
+//     // @ts-ignore
+//     const fileBlob = new Blob([file.data], { type });
+//     const res = await geminiClient.files.upload({
+//       file: fileBlob,
+//       config: { mimeType: type },
+//     });
+
+//     // POLLING FILE STATUS
+//     const fileId = res.name;
+//     const timeout = 10 * 60 * 1000; // 10 minutes
+//     const interval = 10 * 1000; // 10 seconds
+//     const start = Date.now();
+//     let fileStatus = res;
+
+//     while (Date.now() - start < timeout) {
+//       fileStatus = await geminiClient.files.get({ name: fileId as string });
+//       if (fileStatus.state === "ACTIVE") {
+//         console.log("File is ACTIVE ✅", fileStatus);
+//         break;
+//       }
+//       console.log("File still processing... state:", fileStatus.state);
+//       await new Promise((resolve) => setTimeout(resolve, interval));
+//     }
+
+//     return {
+//       fileName: res.name,
+//       size: res.sizeBytes,
+//       mimType: res.mimeType,
+//       uri: res.uri,
+//     };
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+
 const uploadFile = async (file: UploadedFile, type: string) => {
+  const timeout = 10 * 60 * 1000; // 10 minutes
+  const pollInterval = 10 * 1000; // 10 seconds
+  const uploadRetryDelays = [5_000, 15_000, 30_000]; // retry delays for upload (5s → 15s → 30s)
+
+  // Helper: wait function
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
   try {
-    // const pdfBuffer = await fetch(fileURL).then((response) => response.arrayBuffer());
-    // @ts-ignore
-    const fileBlob = new Blob([file.data], { type });
-    const res = await geminiClient.files.upload({
-      file: fileBlob,
-      config: { mimeType: type },
-    });
-
-    // POLLING FILE STATUS
-    const fileId = res.name;
-    const timeout = 10 * 60 * 1000; // 10 minutes
-    const interval = 10 * 1000; // 10 seconds
-    const start = Date.now();
-    let fileStatus = res;
-
-    while (Date.now() - start < timeout) {
-      fileStatus = await geminiClient.files.get({ name: fileId as string });
-      if (fileStatus.state === "ACTIVE") {
-        console.log("File is ACTIVE ✅", fileStatus);
-        break;
+    // ========== 1. Upload with retry ==========
+    let uploadRes;
+    for (let attempt = 0; attempt <= uploadRetryDelays.length; attempt++) {
+      try {
+        // @ts-ignore
+        const fileBlob = new Blob([file.data], { type });
+        uploadRes = await geminiClient.files.upload({
+          file: fileBlob,
+          config: { mimeType: type },
+        });
+        break; // success ✅
+      } catch (err: any) {
+        if (err?.status === 503 || err?.statusCode === 503) {
+          if (attempt < uploadRetryDelays.length) {
+            console.warn(
+              `503 on upload. Retrying in ${uploadRetryDelays[attempt] / 1000}s...`
+            );
+            await wait(uploadRetryDelays[attempt]);
+            continue;
+          }
+        }
+        throw err; // non-503 or max retries exceeded
       }
-      console.log("File still processing... state:", fileStatus.state);
-      await new Promise((resolve) => setTimeout(resolve, interval));
     }
 
+    if (!uploadRes)throw new Error("Upload failed after retries.");
+  
+    // ========== 2. Poll status ==========
+    const fileId = uploadRes.name;
+    const start = Date.now();
+    let fileStatus = uploadRes;
+
+    while (Date.now() - start < timeout) {
+      try {
+        fileStatus = await geminiClient.files.get({ name: fileId as string });
+        if (fileStatus.state === "ACTIVE") {
+          console.log("✅ File is ACTIVE", fileStatus);
+          break;
+        }
+        console.log("⏳ File still processing... state:", fileStatus.state);
+      } catch (err: any) {
+        if (err?.status === 503 || err?.statusCode === 503) {
+          console.warn("503 while polling. Retrying in 10s...");
+          await wait(pollInterval);
+          continue; // keep polling
+        }
+        throw err; // non-503 error
+      }
+      await wait(pollInterval);
+    }
+
+    if (fileStatus.state !== "ACTIVE") {
+      throw new Error("File did not become ACTIVE within 10 minutes");
+    }
+
+    // ========== 3. Return final details ==========
     return {
-      fileName: res.name,
-      size: res.sizeBytes,
-      mimType: res.mimeType,
-      uri: res.uri,
+      fileName: fileStatus.name,
+      size: fileStatus.sizeBytes,
+      mimType: fileStatus.mimeType,
+      uri: fileStatus.uri,
     };
   } catch (error) {
+    console.error("❌ uploadFile failed:", error);
     throw error;
   }
 };
@@ -115,7 +193,7 @@ const deleteFile = async (fileName: string) => {
     return deleteFile;
   } catch (error) {
     console.log("Error In Delete File::", error);
-    throw error;
+    // throw error;
   }
 };
 

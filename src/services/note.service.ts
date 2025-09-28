@@ -54,7 +54,7 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     notesData.source = { type, link, uploadId };
 
     if (originalPath) notesData["source"]["link"] = originalPath;
-    if (fileId) await geminiHelper.deleteFile(fileId as string);
+    if (fileId) geminiHelper.deleteFile(fileId as string)
 
     // Save note
     const newNote = await NoteModel.create({ ...notesData, createdBy: userId });
