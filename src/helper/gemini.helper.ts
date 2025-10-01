@@ -49,7 +49,7 @@ const getNotesResponse = async (
           continue;
         }
       }
-      if (currentModel !== retryConfig.fallbackModel) {
+      if (currentModel !== retryConfig.fallbackModel && (error?.status === 503 || error?.statusCode === 503)) {
         console.warn(`503 persists. Switching model from ${currentModel} to ${retryConfig.fallbackModel}`);
         currentModel = retryConfig.fallbackModel;
         apiAttempt = 0;
