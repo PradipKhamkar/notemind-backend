@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import noteService from "../services/note.service";
 import { errorResponse, successResponse } from "../helper/response.helper";
 import fileService from "../services/file.service";
 import { UploadedFile } from "express-fileupload";

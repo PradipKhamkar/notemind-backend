@@ -10,7 +10,7 @@ import config from "../config";
 
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
-    
+
     // === Quota checks remain same ===
     const userInfo = await UserModel.findById(userId).select("freeQuotaExceed");
     if (!userInfo) throw new Error("user not found!");
@@ -36,13 +36,13 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
 
     // @ts-ignore
     const notesData: INote = {};
-    const aiStructureOutput = await geminiHelper.getNotesResponse(system,messages,responseFormat);
-    
+    const aiStructureOutput = await geminiHelper.getNotesResponse(system, messages, responseFormat);
+
     // === Map response into DB schema ===
     notesData["title"] = aiStructureOutput.title;
     notesData.data = [
       {
-        language: aiStructureOutput.language,
+        language: 'default',
         content: {
           keyPoints: aiStructureOutput.key_points,
           sections: aiStructureOutput.sections,
@@ -139,11 +139,10 @@ const translateNote = async (payload: INoteTranslatePayload, userId: string) => 
     }];
 
     const res = await geminiHelper.getNotesResponse(promptConstant.translateNote, messages, structureConstant.translate);
-    const { key_points, sections, summary } = JSON.parse(res as string);
+    const { key_points, sections, summary } = res || {}
     const content = { content: { keyPoints: key_points, sections, summary }, language: targetLanguage, }
     note.data = [...note.data, content];
     await note.save();
-    console.log('ai response', content)
     return {
       updatedNote: note,
       content: content
