@@ -86,7 +86,7 @@ const newNote = (userId, payload) => __awaiter(void 0, void 0, void 0, function*
         notesData["title"] = aiStructureOutput.title;
         notesData.data = [
             {
-                language: aiStructureOutput.language,
+                language: 'default',
                 content: {
                     keyPoints: aiStructureOutput.key_points,
                     sections: aiStructureOutput.sections,
@@ -176,11 +176,10 @@ const translateNote = (payload, userId) => __awaiter(void 0, void 0, void 0, fun
       target_language:${targetLanguage}`
             }];
         const res = yield gemini_helper_1.default.getNotesResponse(prompt_constant_1.default.translateNote, messages, structure_constant_1.default.translate);
-        const { key_points, sections, summary } = JSON.parse(res);
+        const { key_points, sections, summary } = res || {};
         const content = { content: { keyPoints: key_points, sections, summary }, language: targetLanguage, };
         note.data = [...note.data, content];
         yield note.save();
-        console.log('ai response', content);
         return {
             updatedNote: note,
             content: content

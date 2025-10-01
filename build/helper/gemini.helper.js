@@ -55,7 +55,7 @@ const getNotesResponse = (system_1, messages_1, structureOutput_1, ...args_1) =>
                     continue;
                 }
             }
-            if (currentModel !== retryConfig.fallbackModel) {
+            if (currentModel !== retryConfig.fallbackModel && ((error === null || error === void 0 ? void 0 : error.status) === 503 || (error === null || error === void 0 ? void 0 : error.statusCode) === 503)) {
                 console.warn(`503 persists. Switching model from ${currentModel} to ${retryConfig.fallbackModel}`);
                 currentModel = retryConfig.fallbackModel;
                 apiAttempt = 0;
