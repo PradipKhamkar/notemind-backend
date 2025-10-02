@@ -16,6 +16,7 @@ const cloudinary_1 = require("cloudinary");
 const config_1 = __importDefault(require("../config"));
 const { CLOUD_NAME, API_KEY, API_SECRET, FOLDER_NAME } = config_1.default.CLOUDINARY;
 const gemini_helper_1 = __importDefault(require("../helper/gemini.helper"));
+const note_helper_1 = __importDefault(require("../helper/note.helper"));
 cloudinary_1.v2.config({
     cloud_name: CLOUD_NAME,
     api_key: API_KEY,
@@ -48,6 +49,7 @@ const uploadFileOnCloudinary = (file) => __awaiter(void 0, void 0, void 0, funct
 });
 const uploadFile = (file, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        yield note_helper_1.default.checkUserQuota(userId);
         // const cloudinaryResponse = await uploadFileOnCloudinary(file);
         // const { type, url, uploadId } = cloudinaryResponse;
         // console.log('file::',file.data)
