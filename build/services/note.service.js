@@ -50,28 +50,10 @@ const prompt_constant_1 = __importDefault(require("../constants/prompt.constant"
 const note_model_1 = require("../models/note.model");
 const folder_model_1 = __importDefault(require("../models/folder.model"));
 const structure_constant_1 = __importStar(require("../constants/structure.constant"));
-const user_model_1 = require("../models/user.model");
-const purchase_service_1 = __importDefault(require("./purchase.service"));
-const config_1 = __importDefault(require("../config"));
+const note_helper_1 = __importDefault(require("../helper/note.helper"));
 const newNote = (userId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // === Quota checks remain same ===
-        const userInfo = yield user_model_1.UserModel.findById(userId).select("freeQuotaExceed");
-        if (!userInfo)
-            throw new Error("user not found!");
-        if (userInfo.freeQuotaExceed) {
-            const purchase = yield purchase_service_1.default.verifyPurchase(userId);
-            if ((purchase === null || purchase === void 0 ? void 0 : purchase.status) !== "active")
-                throw new Error("subscription_need");
-        }
-        else {
-            const createdNotes = yield note_model_1.NoteModel.countDocuments({ createdBy: userId });
-            if (createdNotes >= config_1.default.FREE_NOTE_QUOTA) {
-                userInfo.freeQuotaExceed = true;
-                yield userInfo.save();
-                throw new Error("free_quota_exceed");
-            }
-        }
+        yield note_helper_1.default.checkUserQuota(userId);
         // === Input prep ===
         const { type, sourceData } = payload;
         const { link, fileId, originalPath, uploadId } = sourceData;

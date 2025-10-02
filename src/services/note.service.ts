@@ -4,28 +4,11 @@ import promptConstant from "../constants/prompt.constant";
 import { NoteModel } from "../models/note.model";
 import FolderModel from "../models/folder.model";
 import structureConstant, { responseFormat } from "../constants/structure.constant";
-import { UserModel } from "../models/user.model";
-import purchaseService from "./purchase.service";
-import config from "../config";
+import noteHelper from "../helper/note.helper";
 
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
-
-    // === Quota checks remain same ===
-    const userInfo = await UserModel.findById(userId).select("freeQuotaExceed");
-    if (!userInfo) throw new Error("user not found!");
-
-    if (userInfo.freeQuotaExceed) {
-      const purchase = await purchaseService.verifyPurchase(userId);
-      if (purchase?.status !== "active") throw new Error("subscription_need");
-    } else {
-      const createdNotes = await NoteModel.countDocuments({ createdBy: userId });
-      if (createdNotes >= config.FREE_NOTE_QUOTA) {
-        userInfo.freeQuotaExceed = true;
-        await userInfo.save();
-        throw new Error("free_quota_exceed");
-      }
-    }
+    await noteHelper.checkUserQuota(userId);
 
     // === Input prep ===
     const { type, sourceData } = payload;

@@ -3,6 +3,7 @@ import config from "../config";
 const { CLOUD_NAME, API_KEY, API_SECRET, FOLDER_NAME } = config.CLOUDINARY;
 import { UploadedFile } from "express-fileupload";
 import geminiHelper from "../helper/gemini.helper";
+import noteHelper from "../helper/note.helper";
 
 cloudinary.config({
   cloud_name: CLOUD_NAME,
@@ -36,6 +37,7 @@ const uploadFileOnCloudinary = async (file: UploadedFile) => {
 
 const uploadFile = async (file: UploadedFile, userId: string) => {
   try {
+    await noteHelper.checkUserQuota(userId);
     // const cloudinaryResponse = await uploadFileOnCloudinary(file);
     // const { type, url, uploadId } = cloudinaryResponse;
     // console.log('file::',file.data)
