@@ -21,16 +21,19 @@ const checkUserQuota = (userId) => __awaiter(void 0, void 0, void 0, function* (
         const userInfo = yield user_model_1.UserModel.findById(userId).select("freeQuotaExceed");
         if (!userInfo)
             throw new Error("user not found");
+        console.log('userInfo.freeQuotaExceed', userInfo.freeQuotaExceed);
         if (userInfo.freeQuotaExceed) {
             const purchase = yield purchase_service_1.default.verifyPurchase(userId);
             if ((purchase === null || purchase === void 0 ? void 0 : purchase.status) !== "active")
                 throw new Error("subscription_need");
         }
-        const noteCount = yield note_model_1.NoteModel.countDocuments({ createdBy: userId });
-        if (noteCount >= config_1.default.FREE_NOTE_QUOTA) {
-            userInfo.freeQuotaExceed = true;
-            yield userInfo.save();
-            throw new Error("free_quota_exceed");
+        else {
+            const noteCount = yield note_model_1.NoteModel.countDocuments({ createdBy: userId });
+            if (noteCount >= config_1.default.FREE_NOTE_QUOTA) {
+                userInfo.freeQuotaExceed = true;
+                yield userInfo.save();
+                throw new Error("free_quota_exceed");
+            }
         }
         return true;
     }
