@@ -16,7 +16,7 @@ const config_1 = __importDefault(require("../config"));
 const googleapis_1 = require("googleapis");
 const purchase_model_1 = __importDefault(require("../models/purchase.model"));
 const androidpublisher = googleapis_1.google.androidpublisher("v3");
-const packageName = "com.pradip.notemind";
+const packageName = "com.pradip.notebookai";
 const auth = new googleapis_1.google.auth.GoogleAuth({
     credentials: JSON.parse(config_1.default.GOOGLE.SERVICE_ACCOUNT),
     scopes: ["https://www.googleapis.com/auth/androidpublisher"],

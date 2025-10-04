@@ -2,7 +2,7 @@ import config from "../config";
 import { google } from "googleapis";
 import PurchaseModel from "../models/purchase.model";
 const androidpublisher = google.androidpublisher("v3");
-const packageName = "com.pradip.notemind";
+const packageName = "com.pradip.notebookai";
 
 const auth = new google.auth.GoogleAuth({
   credentials: JSON.parse(config.GOOGLE.SERVICE_ACCOUNT as string),
