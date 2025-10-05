@@ -9,4 +9,5 @@ const route = express_1.default.Router();
 route.post('/', folder_controller_1.default.create);
 route.delete('/:id', folder_controller_1.default.remove);
 route.put('/', folder_controller_1.default.update);
+route.put('/sequence', folder_controller_1.default.updateSequences);
 exports.default = route;

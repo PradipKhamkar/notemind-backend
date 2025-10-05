@@ -54,6 +54,10 @@ const folderSchema = new mongoose_1.Schema({
     isPin: {
         type: Boolean,
         default: false
+    },
+    order: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 const FolderModel = (0, mongoose_1.model)("folders", folderSchema);

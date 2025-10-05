@@ -95,7 +95,7 @@ const getAllNotes = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const notes = yield note_model_1.NoteModel.find({ createdBy: userId }).select('-createdBy');
         ;
-        const folders = yield folder_model_1.default.find({ createdBy: userId }).select('-createdBy');
+        const folders = yield folder_model_1.default.find({ createdBy: userId }).select('-createdBy').sort({ order: 1 });
         return { notes, folders };
     }
     catch (error) {

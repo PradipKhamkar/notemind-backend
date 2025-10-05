@@ -48,4 +48,17 @@ const update = (request, res) => __awaiter(void 0, void 0, void 0, function* () 
         (0, response_helper_1.errorResponse)(res, (error === null || error === void 0 ? void 0 : error.message) || "Failed To Folder");
     }
 });
-exports.default = { create, remove, update };
+const updateSequences = (request, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log('updateSequences payload::', request.body);
+        // @ts-ignore
+        const userId = request.userId;
+        const folder = yield folder_service_1.default.updateSequence(request.body.data, userId);
+        (0, response_helper_1.successResponse)(res, "Folder Sequences Updated Successfully!", folder, 200);
+    }
+    catch (error) {
+        console.log('Error In Update Folder Sequences', error);
+        (0, response_helper_1.errorResponse)(res, (error === null || error === void 0 ? void 0 : error.message) || "Failed To Update Folder Sequences");
+    }
+});
+exports.default = { create, remove, update, updateSequences };
