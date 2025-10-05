@@ -51,4 +51,19 @@ const update = (folderId, payload, userId) => __awaiter(void 0, void 0, void 0, 
         throw error;
     }
 });
-exports.default = { create, remove, update };
+const updateSequence = (folders, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const bulkOps = folders.map(f => ({
+            updateOne: {
+                filter: { _id: f._id, createdBy: userId },
+                update: { $set: { order: f.order } },
+            },
+        }));
+        yield folder_model_1.default.bulkWrite(bulkOps);
+        return { message: "sequences update successfully!" };
+    }
+    catch (error) {
+        throw error;
+    }
+});
+exports.default = { create, remove, update, updateSequence };
