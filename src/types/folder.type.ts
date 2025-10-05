@@ -6,5 +6,6 @@ export interface IFolder{
   updatedAt:string;
   createdAt:string;
   isPin:boolean;
+  order:number
 }
 

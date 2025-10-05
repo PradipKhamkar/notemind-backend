@@ -5,5 +5,6 @@ const route = express.Router();
 route.post('/',folderController.create);
 route.delete('/:id',folderController.remove);
 route.put('/',folderController.update);
+route.put('/sequence',folderController.updateSequences);
 
 export default route

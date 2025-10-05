@@ -41,5 +41,19 @@ const update = async (request: Request, res: Response) => {
 
 
 
+const updateSequences = async (request: Request, res: Response) => {
+  try {
+     console.log('updateSequences payload::',request.body)
+    // @ts-ignore
+    const userId = request.userId
+    const folder = await folderService.updateSequence(request.body.data, userId);
+    successResponse(res, "Folder Sequences Updated Successfully!", folder, 200);
+  } catch (error: any) {
+    console.log('Error In Update Folder Sequences', error)
+    errorResponse(res, error?.message || "Failed To Update Folder Sequences")
+  }
+}
 
-export default {create,remove,update}
+
+
+export default {create,remove,update,updateSequences}

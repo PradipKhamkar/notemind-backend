@@ -52,7 +52,7 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
 const getAllNotes = async (userId: string) => {
   try {
     const notes = await NoteModel.find({ createdBy: userId }).select('-createdBy');;
-    const folders = await FolderModel.find({ createdBy: userId }).select('-createdBy');
+    const folders = await FolderModel.find({ createdBy: userId }).select('-createdBy').sort({ order: 1 });
     return { notes, folders }
   } catch (error) {
     throw error
