@@ -41,4 +41,19 @@ const update = async (folderId: string, payload: IFolder, userId: string) => {
   }
 }
 
-export default { create, remove, update }
+const updateSequence = async (folders: IFolder[], userId: string) => {
+  try {
+    const bulkOps = folders.map(f => ({
+      updateOne: {
+        filter: { _id: f._id,createdBy:userId },
+        update: { $set: { order: f.order } },
+      },
+    }));
+    await FolderModel.bulkWrite(bulkOps);
+    return { message: "sequences update successfully!" }
+  } catch (error) {
+    throw error
+  }
+}
+
+export default { create, remove, update, updateSequence }

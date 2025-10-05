@@ -21,6 +21,10 @@ const folderSchema = new Schema<IFolder>({
   isPin: {
     type: Boolean,
     default: false
+  },
+  order: {
+    type: Number,
+    default: 0
   }
 }, { timestamps: true });
 
