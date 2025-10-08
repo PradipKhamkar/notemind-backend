@@ -1,7 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, createUserContent, createModelContent } from "@google/genai";
 import config from "../config";
 import { UploadedFile } from "express-fileupload";
-import { IRetryConfig } from "../types/llm.type";
+import { IMessage, IRetryConfig } from "../types/llm.type";
 
 const geminiClient = new GoogleGenAI({ apiKey: config.GOOGLE.GEMINI_API_KEY });
 
@@ -67,45 +67,6 @@ const getFileURLMessage = (fileUrl: string) => {
     },
   };
 };
-
-// const uploadFile = async (file: UploadedFile, type: string) => {
-//   try {
-//     // const pdfBuffer = await fetch(fileURL).then((response) => response.arrayBuffer());
-//     // @ts-ignore
-//     const fileBlob = new Blob([file.data], { type });
-//     const res = await geminiClient.files.upload({
-//       file: fileBlob,
-//       config: { mimeType: type },
-//     });
-
-//     // POLLING FILE STATUS
-//     const fileId = res.name;
-//     const timeout = 10 * 60 * 1000; // 10 minutes
-//     const interval = 10 * 1000; // 10 seconds
-//     const start = Date.now();
-//     let fileStatus = res;
-
-//     while (Date.now() - start < timeout) {
-//       fileStatus = await geminiClient.files.get({ name: fileId as string });
-//       if (fileStatus.state === "ACTIVE") {
-//         console.log("File is ACTIVE ✅", fileStatus);
-//         break;
-//       }
-//       console.log("File still processing... state:", fileStatus.state);
-//       await new Promise((resolve) => setTimeout(resolve, interval));
-//     }
-
-//     return {
-//       fileName: res.name,
-//       size: res.sizeBytes,
-//       mimType: res.mimeType,
-//       uri: res.uri,
-//     };
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
 
 const uploadFile = async (file: UploadedFile, type: string) => {
   const timeout = 10 * 60 * 1000; // 10 minutes
@@ -197,10 +158,29 @@ const deleteFile = async (fileName: string) => {
   }
 };
 
+const streamResponse = async (messages: IMessage[], systemInstruction: string, model: string = "gemini-2.5-flash") => {
+  try {
+    // @ts-ignore
+    messages = messages.map((m) => {
+      if (m.role === "user") return createUserContent(m.content);
+      return createModelContent(m.content)
+    });
+    const stream = await geminiClient.models.generateContentStream({
+      contents: messages,
+      model: model,
+      config: { systemInstruction: { parts: [{ text: systemInstruction }] } },
+    });
+    return stream
+  } catch (error) {
+    throw error
+  }
+};
+
 export default {
   getNotesResponse,
   getFileURLMessage,
   geminiClient,
   uploadFile,
   deleteFile,
+  streamResponse
 };

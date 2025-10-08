@@ -6,6 +6,7 @@ import noteService from "../services/note.service";
 import { INewNotePayload, INoteTranslatePayload } from "../types/note.type";
 import AuthenticateSocket from "../middleware/AuthenticateSocket";
 import { IUser } from "../types/user.type";
+import { IAskNotePayload, ISocketResponse } from "../types/llm.type";
 const app = express();
 
 const httpServer = createServer(app);
@@ -18,7 +19,7 @@ io.use(AuthenticateSocket);
 io.on("connect", (socket) => {
   // @ts-ignore
   const user: IUser = socket.user;
-  const { noteJob, translate } = socketConstant.events;
+  const { noteJob, translate, askNote } = socketConstant.events;
 
   socket.on(noteJob.job_added, async (payload: INewNotePayload) => {
     try {
@@ -26,7 +27,7 @@ io.on("connect", (socket) => {
       socket.emit(noteJob.job_started)
       const newNote = await noteService.newNote(user._id, payload);
       socket.emit(noteJob.job_done, newNote)
-    } catch (error:any) {
+    } catch (error: any) {
       socket.emit(noteJob.job_failed, error?.message)
     }
   });
@@ -41,6 +42,14 @@ io.on("connect", (socket) => {
       socket.emit(translate.job_failed, error)
     }
   });
+  socket.on(askNote.query, async (payload: IAskNotePayload) => {
+    try {
+      await noteService.askNote(socket, user._id, payload.noteId, payload.query);
+    } catch (error: any) {
+      socket.emit(askNote.message, { content: { message: error.message || "error occurred" }, type: "error" } as ISocketResponse);
+      console.log('Error inside ask note::', error)
+    }
+  })
 });
 
 

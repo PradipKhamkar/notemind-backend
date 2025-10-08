@@ -21,7 +21,6 @@ const checkUserQuota = (userId) => __awaiter(void 0, void 0, void 0, function* (
         const userInfo = yield user_model_1.UserModel.findById(userId).select("freeQuotaExceed");
         if (!userInfo)
             throw new Error("user not found");
-        console.log('userInfo.freeQuotaExceed', userInfo.freeQuotaExceed);
         if (userInfo.freeQuotaExceed) {
             const purchase = yield purchase_service_1.default.verifyPurchase(userId);
             if ((purchase === null || purchase === void 0 ? void 0 : purchase.status) !== "active")

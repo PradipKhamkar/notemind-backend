@@ -72,40 +72,6 @@ const getFileURLMessage = (fileUrl) => {
         },
     };
 };
-// const uploadFile = async (file: UploadedFile, type: string) => {
-//   try {
-//     // const pdfBuffer = await fetch(fileURL).then((response) => response.arrayBuffer());
-//     // @ts-ignore
-//     const fileBlob = new Blob([file.data], { type });
-//     const res = await geminiClient.files.upload({
-//       file: fileBlob,
-//       config: { mimeType: type },
-//     });
-//     // POLLING FILE STATUS
-//     const fileId = res.name;
-//     const timeout = 10 * 60 * 1000; // 10 minutes
-//     const interval = 10 * 1000; // 10 seconds
-//     const start = Date.now();
-//     let fileStatus = res;
-//     while (Date.now() - start < timeout) {
-//       fileStatus = await geminiClient.files.get({ name: fileId as string });
-//       if (fileStatus.state === "ACTIVE") {
-//         console.log("File is ACTIVE ✅", fileStatus);
-//         break;
-//       }
-//       console.log("File still processing... state:", fileStatus.state);
-//       await new Promise((resolve) => setTimeout(resolve, interval));
-//     }
-//     return {
-//       fileName: res.name,
-//       size: res.sizeBytes,
-//       mimType: res.mimeType,
-//       uri: res.uri,
-//     };
-//   } catch (error) {
-//     throw error;
-//   }
-// };
 const uploadFile = (file, type) => __awaiter(void 0, void 0, void 0, function* () {
     const timeout = 10 * 60 * 1000; // 10 minutes
     const pollInterval = 10 * 1000; // 10 seconds
@@ -191,10 +157,30 @@ const deleteFile = (fileName) => __awaiter(void 0, void 0, void 0, function* () 
         // throw error;
     }
 });
+const streamResponse = (messages_1, systemInstruction_1, ...args_1) => __awaiter(void 0, [messages_1, systemInstruction_1, ...args_1], void 0, function* (messages, systemInstruction, model = "gemini-2.5-flash") {
+    try {
+        // @ts-ignore
+        messages = messages.map((m) => {
+            if (m.role === "user")
+                return (0, genai_1.createUserContent)(m.content);
+            return (0, genai_1.createModelContent)(m.content);
+        });
+        const stream = yield geminiClient.models.generateContentStream({
+            contents: messages,
+            model: model,
+            config: { systemInstruction: { parts: [{ text: systemInstruction }] } },
+        });
+        return stream;
+    }
+    catch (error) {
+        throw error;
+    }
+});
 exports.default = {
     getNotesResponse,
     getFileURLMessage,
     geminiClient,
     uploadFile,
     deleteFile,
+    streamResponse
 };

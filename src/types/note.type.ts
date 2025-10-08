@@ -1,3 +1,5 @@
+import { IMessage } from "./llm.type";
+
 interface INewNotePayload {
   type: TSource;
   sourceData: {
@@ -38,6 +40,8 @@ interface INote {
   };
   data: INoteContent[]
   metaData: object;
+  messages: IMessage[];
+  suggestions: string[]
 }
 
 interface INoteTranslatePayload {
