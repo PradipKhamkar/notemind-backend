@@ -5,6 +5,9 @@ import { NoteModel } from "../models/note.model";
 import FolderModel from "../models/folder.model";
 import structureConstant, { responseFormat } from "../constants/structure.constant";
 import noteHelper from "../helper/note.helper";
+import { Socket } from "socket.io";
+import socketConstant from "../constants/socket.constant";
+import { IMessage, ISocketResponse } from "../types/llm.type";
 
 const newNote = async (userId: string, payload: INewNotePayload) => {
   try {
@@ -47,7 +50,6 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     throw error;
   }
 };
-
 
 const getAllNotes = async (userId: string) => {
   try {
@@ -136,4 +138,57 @@ const translateNote = async (payload: INoteTranslatePayload, userId: string) => 
   }
 }
 
-export default { newNote, getAllNotes, updateNote, deleteNote, translateNote }
+const askNote = async (socket: Socket, userId: string, noteId: string, query: string) => {
+  const { askNote } = socketConstant.events
+  try {
+    socket.emit(askNote.message, {
+      type: "pull_db",
+      content: { message: "Retrieving Note..." }
+    } as ISocketResponse);
+
+    const noteInfo = await NoteModel.findOne({ _id: noteId, createdBy: userId });
+    if (!noteInfo) throw new Error("Note Not Found!")
+    const noteContext = noteInfo.data.find((d) => d.language === "default")?.content;
+
+    socket.emit(askNote.message, {
+      type: "thinking",
+      content: { message: "Reading Note..." }
+    } as ISocketResponse);
+
+    // start stream
+    const systemInstruction = `You are an intelligent assistant that helps users work with their notes.
+You are given the context of a note written by the user. Use this note context to understand their ideas, writing style, and intent.
+When answering questions or generating content, reference the note’s information when relevant.
+If the note does not contain the requested information, respond naturally and provide helpful, general insights.
+Always keep responses concise, coherent, and contextually aligned with the user’s note.
+Note Context:${JSON.stringify(noteContext)}`
+
+    const messages: IMessage[] = [...noteInfo.messages || [], { role: "user", content: query }];
+    const streamRes = await geminiHelper.streamResponse(messages, systemInstruction);
+
+    // streaming ai response;
+    let finalText = ""
+    for await (let chunk of streamRes) {
+      const textRes = chunk.text
+      if (textRes) {
+        finalText += chunk.text
+        socket.emit(askNote.message, {
+          type: "text",
+          content: { message: finalText }
+        } as ISocketResponse);
+      }
+    }
+
+    socket.emit(askNote.message, { content: { message: finalText }, type: "completed" } as ISocketResponse);
+
+    // store chat history
+    messages.push({ role: "assistant", content: finalText });
+    noteInfo.messages = messages;
+    await noteInfo.save();
+    return {}
+  } catch (error: any) {
+    throw error
+  }
+}
+
+export default { newNote, getAllNotes, updateNote, deleteNote, translateNote, askNote }

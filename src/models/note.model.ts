@@ -1,5 +1,6 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import { INote } from "../types/note.type";
+import { IMessage } from "../types/llm.type";
 
 
 const NoteSchema = new Schema<INote>(
@@ -30,6 +31,14 @@ const NoteSchema = new Schema<INote>(
     },
     transcript: { type: Schema.Types.Mixed },
     metaData: { type: Schema.Types.Mixed, default: {} },
+    messages: {
+      type: Schema.Types.Mixed,
+      default: [],
+    },
+    suggestions: {
+      type: Schema.Types.Mixed,
+      default: [],
+    }
   },
   { timestamps: true }
 );

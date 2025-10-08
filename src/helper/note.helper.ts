@@ -7,7 +7,6 @@ const checkUserQuota = async (userId: string) => {
    try {
       const userInfo = await UserModel.findById(userId).select("freeQuotaExceed");
       if (!userInfo) throw new Error("user not found");
-console.log('userInfo.freeQuotaExceed',userInfo.freeQuotaExceed)
       if (userInfo.freeQuotaExceed) {
          const purchase = await purchaseService.verifyPurchase(userId);
          if (purchase?.status !== "active") throw new Error("subscription_need")
@@ -24,6 +23,5 @@ console.log('userInfo.freeQuotaExceed',userInfo.freeQuotaExceed)
       throw error
    }
 }
-
 
 export default { checkUserQuota }
