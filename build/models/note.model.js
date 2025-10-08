@@ -29,5 +29,13 @@ const NoteSchema = new mongoose_1.Schema({
     },
     transcript: { type: mongoose_1.Schema.Types.Mixed },
     metaData: { type: mongoose_1.Schema.Types.Mixed, default: {} },
+    messages: {
+        type: mongoose_1.Schema.Types.Mixed,
+        default: [],
+    },
+    suggestions: {
+        type: mongoose_1.Schema.Types.Mixed,
+        default: [],
+    }
 }, { timestamps: true });
 exports.NoteModel = (0, mongoose_1.model)("Note", NoteSchema);

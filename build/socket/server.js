@@ -29,7 +29,7 @@ io.use(AuthenticateSocket_1.default);
 io.on("connect", (socket) => {
     // @ts-ignore
     const user = socket.user;
-    const { noteJob, translate } = socket_constant_1.default.events;
+    const { noteJob, translate, askNote } = socket_constant_1.default.events;
     socket.on(noteJob.job_added, (payload) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             console.log('new note event catch');
@@ -50,6 +50,15 @@ io.on("connect", (socket) => {
         }
         catch (error) {
             socket.emit(translate.job_failed, error);
+        }
+    }));
+    socket.on(askNote.query, (payload) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            yield note_service_1.default.askNote(socket, user._id, payload.noteId, payload.query);
+        }
+        catch (error) {
+            socket.emit(askNote.message, { content: { message: error.message || "error occurred" }, type: "error" });
+            console.log('Error inside ask note::', error);
         }
     }));
 });
