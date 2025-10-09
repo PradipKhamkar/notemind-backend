@@ -38,7 +38,8 @@ const newNote = async (userId: string, payload: INewNotePayload) => {
     ];
     notesData.metaData = aiStructureOutput?.metaData;
     notesData.source = { type, link, uploadId };
-
+    notesData.suggestionQuery = aiStructureOutput.suggestionQuery;
+    
     if (originalPath) notesData["source"]["link"] = originalPath;
     if (fileId) geminiHelper.deleteFile(fileId as string)
 
@@ -174,7 +175,7 @@ Note Context:${JSON.stringify(noteContext)}`
         finalText += chunk.text
         socket.emit(askNote.message, {
           type: "text",
-          content: { message: finalText }
+          content: { message: chunk.text }
         } as ISocketResponse);
       }
     }
