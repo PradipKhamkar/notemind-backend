@@ -41,7 +41,7 @@ interface INote {
   data: INoteContent[]
   metaData: object;
   messages: IMessage[];
-  suggestions: string[]
+  suggestionQuery: string[]
 }
 
 interface INoteTranslatePayload {

@@ -35,7 +35,7 @@ const NoteSchema = new Schema<INote>(
       type: Schema.Types.Mixed,
       default: [],
     },
-    suggestions: {
+    suggestionQuery: {
       type: Schema.Types.Mixed,
       default: [],
     }
