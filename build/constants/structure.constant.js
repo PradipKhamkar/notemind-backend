@@ -328,7 +328,7 @@ exports.translate = exports.responseFormat = void 0;
 // export default structureOutputJSONSchema;
 exports.responseFormat = {
     "type": "object",
-    "required": ["title", "summary", "key_points", "sections", 'language'],
+    "required": ["title", "summary", "key_points", "sections", 'language', "suggestionQuery"],
     // "if": {
     //   "properties": {
     //     "source_type": {
@@ -452,6 +452,18 @@ exports.responseFormat = {
             "type": "string",
             "description": "ISO 639-1 language code of note content generated",
             "examples": ["en", "es", "fr", "de", "hi", "ja", "ko", "zh", "ar", "pt", "ru", "it"]
+        },
+        "suggestionQuery": {
+            "type": "array",
+            "description": "Generate 3-5 contextual question suggestions query based on the note content that users can ask the AI assistant. Each suggestion should be relevant, specific, and encourage deeper engagement with the material.",
+            "items": {
+                "type": "string",
+                "description": "A suggested question or prompt related to the note content",
+                "minLength": 10,
+                "maxLength": 100
+            },
+            "minItems": 3,
+            "maxItems": 5,
         }
     },
     "additionalProperties": false,

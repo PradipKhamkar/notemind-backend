@@ -86,6 +86,7 @@ const newNote = (userId, payload) => __awaiter(void 0, void 0, void 0, function*
         ];
         notesData.metaData = aiStructureOutput === null || aiStructureOutput === void 0 ? void 0 : aiStructureOutput.metaData;
         notesData.source = { type, link, uploadId };
+        notesData.suggestionQuery = aiStructureOutput.suggestionQuery;
         if (originalPath)
             notesData["source"]["link"] = originalPath;
         if (fileId)
@@ -218,7 +219,7 @@ Note Context:${JSON.stringify(noteContext)}`;
                     finalText += chunk.text;
                     socket.emit(askNote.message, {
                         type: "text",
-                        content: { message: finalText }
+                        content: { message: chunk.text }
                     });
                 }
             }
