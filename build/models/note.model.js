@@ -33,7 +33,7 @@ const NoteSchema = new mongoose_1.Schema({
         type: mongoose_1.Schema.Types.Mixed,
         default: [],
     },
-    suggestions: {
+    suggestionQuery: {
         type: mongoose_1.Schema.Types.Mixed,
         default: [],
     }
