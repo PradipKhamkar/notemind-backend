@@ -162,7 +162,9 @@ You are given the context of a note written by the user. Use this note context t
 When answering questions or generating content, reference the note’s information when relevant.
 If the note does not contain the requested information, respond naturally and provide helpful, general insights.
 Always keep responses concise, coherent, and contextually aligned with the user’s note.
-Note Context:${JSON.stringify(noteContext)}`
+Note Context:${JSON.stringify(noteContext)}
+**response always in markdown** not other
+`
 
     const messages: IMessage[] = [...noteInfo.messages || [], { role: "user", content: query }];
     const streamRes = await geminiHelper.streamResponse(messages, systemInstruction);
@@ -180,6 +182,7 @@ Note Context:${JSON.stringify(noteContext)}`
       }
     }
 
+    console.log('finalText',finalText)
     socket.emit(askNote.message, { content: { message: finalText }, type: "completed" } as ISocketResponse);
 
     // store chat history
