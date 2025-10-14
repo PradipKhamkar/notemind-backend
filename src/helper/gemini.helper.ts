@@ -158,7 +158,7 @@ const deleteFile = async (fileName: string) => {
   }
 };
 
-const streamResponse = async (messages: IMessage[], systemInstruction: string, model: string = "gemini-2.5-flash") => {
+const streamResponse = async (messages: IMessage[], systemInstruction: string, model: string = "gemini-2.0-flash-lite") => {
   try {
     // @ts-ignore
     messages = messages.map((m) => {
