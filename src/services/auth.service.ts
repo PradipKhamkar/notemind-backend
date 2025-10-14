@@ -6,7 +6,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshAndAccessToken 
 
 const googleLogin = async (authCode: string) => {
   try {
-    console.log('AuthCode::', authCode)
+    // console.log('AuthCode::', authCode)
     const { ENDPOINT, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = config.GOOGLE;
     const headers = { "Content-Type": "application/x-www-form-urlencoded" };
     const response = await axios.post(ENDPOINT.TOKEN, new URLSearchParams({
@@ -51,7 +51,7 @@ const getNewAccessToken = async (refreshToken: string) => {
     const isUserExit = await UserModel.findOne({ _id: decodedToken.userId });
     if (!isUserExit) throw new Error("User not found!");
     const newAccessToken = generateAccessToken({ userId: decodedToken.userId });
-    console.log('newAccessToken', newAccessToken)
+    // console.log('newAccessToken', newAccessToken)
     return {
       accessToken: newAccessToken
     };

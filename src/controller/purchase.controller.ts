@@ -6,7 +6,7 @@ const createPurchase = async(req:Request,res:Response)=>{
   try {
     // @ts-ignore
     const userId = req.userId
-    console.log('PAYLOAD DATA FOR CREATE PURCHASE::',req.body)
+    // console.log('PAYLOAD DATA FOR CREATE PURCHASE::',req.body)
     const purchaseRes = await purchaseService.createPurchase(userId,req.body.purchaseToken,req.body.orderId,req.body.productId,req.body.planType);
     successResponse(res,'purchase created successfully!',purchaseRes);
   } catch (error) {
@@ -19,7 +19,7 @@ const verifyPurchase = async(req:Request,res:Response)=>{
   try {
     // @ts-ignore
     const userId = req.userId
-    console.log('PAYLOAD DATA FOR VERIFY PURCHASE::',req.body)
+    // console.log('PAYLOAD DATA FOR VERIFY PURCHASE::',req.body)
     const purchaseRes = await purchaseService.verifyPurchase(userId);
     successResponse(res,'purchase verified successfully!',purchaseRes);
   } catch (error) {
