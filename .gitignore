@@ -1,7 +1,6 @@
 # OSX
 #
 .DS_Store
-
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -36,7 +35,7 @@ node_modules/
 npm-debug.log
 yarn-error.log
 .env
-
+/build
 # fastlane
 #
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
