@@ -149,8 +149,8 @@ const deleteFile = async (fileName: string) => {
   try {
     const deleteRes = await geminiClient.files.delete({ name: fileName });
     const allFiles = await geminiClient.files.list();
-    console.log("DELETE response", deleteRes);
-    console.log("allFiles", allFiles);
+    // console.log("DELETE response", deleteRes);
+    // console.log("allFiles", allFiles);
     return deleteFile;
   } catch (error) {
     console.log("Error In Delete File::", error);
