@@ -3,6 +3,7 @@ import { IUser } from "../types/user.type";
 import config from "../config";
 
 
+
 const UserSchema = new Schema<IUser>(
   {
     name: {
